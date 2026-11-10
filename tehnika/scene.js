@@ -14,9 +14,7 @@ const back = (p) => 1 - ease(0.86, 0.97, p); // в конце машина со�
 
 // детали по именам узлов модели; всё, что не перечислено, — корпус («рентген»)
 const GROUPS = {
-  door: ['polySurface118', 'polySurface138', 'polySurface127', 'polySurface115', 'polySurface117',
-    'pCylinder1022', 'pCylinder1023', 'pCylinder1024', 'pCylinder1026', 'pCylinder1028', 'pCylinder1029', 'pCylinder1030',
-    'pSphere17', 'pSphere18', 'pCube49', 'pCube50', 'polySurface125', 'polySurface126', 'polySurface128', 'polySurface144'],
+  door: ['polySurface118', 'polySurface138', 'polySurface127', 'polySurface115', 'polySurface117'],
   top: ['polySurface119'],
   panel: ['polySurface116', 'polySurface121', 'polySurface131', 'polySurface120', 'polySurface130', 'polySurface139', 'polySurface141',
     'polySurface143', 'pSphere14', 'pSphere15', 'pSphere16', 'pSphere21', 'pSphere22', 'pSphere19', 'pSphere20', 'pCube52', 'pCube55',
@@ -27,6 +25,9 @@ const GROUPS = {
   feet: ['pCube45', 'pCube46', 'pCube47', 'pCube48', 'pCylinder1015', 'pCylinder1016', 'pCylinder1020', 'pCylinder1036',
     'pCylinder1017', 'pCylinder1018', 'pCylinder1019', 'pCylinder1021', 'pHelix5', 'pHelix6', 'pHelix7', 'pHelix8'],
 };
+// вилка со шнуром лежит внутри машины перед стеклом, и ещё один шланг проходит сквозь дверцу — ошибки расстановки в модели
+const HIDDEN = new Set(['pCylinder1039', 'pCylinder1022', 'pCylinder1023', 'pCylinder1024', 'pCylinder1026', 'pCylinder1028', 'pCylinder1029',
+  'pCylinder1030', 'pSphere17', 'pSphere18', 'pCube49', 'pCube50', 'polySurface125', 'polySurface126', 'polySurface128', 'polySurface144']);
 const groupOf = new Map(Object.entries(GROUPS).flatMap(([g, ns]) => ns.map((n) => [n, g])));
 
 // камера (машина: высота 2,8, центр в нуле, дверца смотрит на +Z)
@@ -105,13 +106,13 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
     if (!o.isMesh) return;
     o.castShadow = true; o.receiveShadow = true;
     // в исходнике один шланг проходит перед дверцей (ошибка расстановки в модели) — прячем
-    if (o.name.startsWith('pCylinder1039') || o.parent?.name === 'pCylinder1039') { o.visible = false; return; }
+    if (HIDDEN.has(o.parent?.name) || HIDDEN.has(o.name.split('_')[0])) { o.visible = false; return; }
     let g = groupOf.get(o.name.replace(/_[A-Za-z0-9]+_0$/, '').replace(/_[a-z_]+\d*_0$/i, '')) || groupOf.get(o.parent?.name) || 'shell';
     (lists[g] ||= []).push(o);
     const m = o.material;
-    if (m.name === 'glass') { m.transparent = true; m.opacity = 0.3; m.roughness = 0.03; m.metalness = 0; o.castShadow = false; }
-    else if (m.name === 'steel') { m.metalness = 0.95; m.roughness = 0.26; }
-    else { m.metalness = 0; m.roughness = Math.min(m.roughness ?? 0.5, 0.38); }
+    // материалы автора оставляем как есть (глянцевая эмаль, полированная сталь); стеклу — чуть больше прозрачности
+    if (m.name === 'glass') { m.opacity = 0.22; m.roughness = 0.02; o.castShadow = false; }
+    if (m.map) m.map.anisotropy = 8;
     if (g === 'shell') {
       if (!shellMats.has(m.uuid)) { const c = m.clone(); c.transparent = true; shellMats.set(m.uuid, c); }
       o.material = shellMats.get(m.uuid);
