@@ -106,11 +106,14 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
   const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
   const key = new THREE.DirectionalLight(0xffffff, 2.2);
   key.position.set(3.5, 7, 5); key.castShadow = true;
-  key.shadow.mapSize.set(coarse ? 1024 : 2048, coarse ? 1024 : 2048);
+  key.shadow.mapSize.set(coarse ? 1024 : 4096, coarse ? 1024 : 4096);
   Object.assign(key.shadow.camera, { left: -4, right: 4, top: 4, bottom: -4, near: 1, far: 20 });
   key.shadow.bias = -0.0002; key.shadow.normalBias = 0.025; key.shadow.radius = 5; // normalBias убирает полосатую рябь теней на гладкой эмали
   const rim = new THREE.DirectionalLight(0xfff1dc, 2.2); rim.position.set(-6, 4, -5);
-  scene.add(key, rim, new THREE.HemisphereLight(0xffffff, 0xc4cad0, 0.3));
+  // студийная трёхточечная схема: ключевой сверху-справа, мягкий заполняющий слева, контровой сзади (из него — блик по кромкам)
+  const fill = new THREE.DirectionalLight(0xeef2ff, 0.9); fill.position.set(-5, 2.5, 4);
+  scene.add(key, rim, fill, new THREE.HemisphereLight(0xffffff, 0xc4cad0, 0.35));
+  scene.environmentIntensity = 1.15;
 
   const loader = new GLTFLoader();
   loader.setMeshoptDecoder(MeshoptDecoder);
@@ -134,7 +137,7 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
     const m = o.material;
     // материалы автора оставляем как есть (глянцевая эмаль, полированная сталь); стеклу — чуть больше прозрачности
     if (m.name === 'glass') { m.opacity = 0.22; m.roughness = 0.02; o.castShadow = false; }
-    if (m.map) m.map.anisotropy = 8;
+    if (m.map) m.map.anisotropy = renderer.capabilities.getMaxAnisotropy(); // максимальная фильтрация текстур
     if (g === 'shell') {
       if (!shellMats.has(m.uuid)) { const c = m.clone(); c.transparent = true; shellMats.set(m.uuid, c); }
       o.material = shellMats.get(m.uuid);
@@ -343,10 +346,20 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
   const camPos = new THREE.Vector3(), camTgt = new THREE.Vector3(), tmp = new THREE.Vector3();
   const clock = new THREE.Clock();
   let first = true, active = -2;
+  const perf = { t: 0, n: 0 };
   const glow = {};
 
   function frame(force) {
     const dt = Math.min(0.05, clock.getDelta());
+    // защита от лагов: если 1,5 с подряд кадр медленнее ~40 к/с — сначала выключаем затенение, потом снижаем разрешение
+    perf.t += dt; perf.n++;
+    if (perf.t > 1.5) {
+      const avg = perf.t / perf.n; perf.t = 0; perf.n = 0;
+      if (avg > 1 / 40 && visible) {
+        if (composer) { composer = null; gtao = null; }
+        else if (renderer.getPixelRatio() > 1) { renderer.setPixelRatio(Math.max(1, renderer.getPixelRatio() - 0.5)); resize(); }
+      }
+    }
     if (!visible && !first && !force) return;
     if (reduced) { s.x = s.target; s.v = 0; } else { const k = 34; s.v += ((s.target - s.x) * k - 2 * Math.sqrt(k) * s.v) * dt; s.x += s.v * dt; }
     const p = clamp01(s.x);
