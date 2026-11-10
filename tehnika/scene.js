@@ -58,15 +58,21 @@ const TAGS = [
   { part: 'door', from: 0.12, to: 0.3, side: 'right', at: [0.6, 0.7, 0.4] },
   { part: 'panel', from: 0.24, to: 0.4, side: 'left', at: [-0.6, 0.3, 0.6] },
   { part: 'drum', from: 0.46, to: 0.62, side: 'right', at: [0.4, 0.75, 0.2] },
-  { part: 'filter', from: 0.6, to: 0.76, side: 'left', at: [0, 0, 1] },
-  { part: 'hoses', from: 0.66, to: 0.82, side: 'left', at: [-0.95, -0.2, 0] },
-  { part: 'feet', from: 0.68, to: 0.82, side: 'left', at: [-0.8, -1, 0.8] },
+  { part: 'filter', from: 0.57, to: 0.67, side: 'right', at: [0, 0, 1] },
+  { part: 'pump', from: 0.58, to: 0.67, side: 'left', at: [-0.6, 0.5, 0.6] },
+  { part: 'heater', from: 0.66, to: 0.76, side: 'right', at: [0.8, 0, 1] },
+  { part: 'motor', from: 0.67, to: 0.76, side: 'left', at: [-0.15, 0.1, 0.05] },
+  { part: 'hoses', from: 0.75, to: 0.86, side: 'left', at: [-0.95, -0.2, 0] },
+  { part: 'feet', from: 0.76, to: 0.86, side: 'right', at: [0.8, -1, 0.8] },
 ];
 const TEXT = {
   door: ['Дверца и манжета', 'Течёт из-под люка, не закрывается', 'от 1 500 ₽'],
   panel: ['Модуль управления', 'Не включается, мигают индикаторы', 'от 3 500 ₽'],
   drum: ['Барабан и подшипники', 'Гул и стук на отжиме', 'от 4 500 ₽'],
-  filter: ['Сливной фильтр и насос', 'Не сливает воду. Фильтр — за лючком внизу, насос стоит за ним', 'от 2 000 ₽'],
+  filter: ['Сливной фильтр', 'Не сливает воду, ошибка слива', 'от 1 500 ₽'],
+  pump: ['Сливной насос', 'Гудит, но вода не уходит', 'от 2 500 ₽'],
+  heater: ['ТЭН', 'Стирает в холодной воде', 'от 2 500 ₽'],
+  motor: ['Мотор, щётки, ремень', 'Барабан не крутится, пахнет гарью', 'от 3 000 ₽'],
   hoses: ['Шланги и патрубки', 'Лужа под машиной', 'от 1 200 ₽'],
   feet: ['Ножки и амортизаторы', 'Прыгает по полу при отжиме', 'от 1 800 ₽'],
 };
@@ -188,6 +194,85 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({ opacity: 0.45 }));
   floor.rotation.x = -Math.PI / 2; floor.position.y = bottomY - 0.005; floor.receiveShadow = true; scene.add(floor);
 
+
+  // Насос, ТЭН и мотор: в исходной модели их нет. Делаем в тех же материалах, что и сама машина (сталь, серый пластик),
+  // гладкой геометрией (вращение профиля, трубки), и ставим туда, где они стоят в настоящей фронтальной машине.
+  {
+    const base = {};
+    for (const { m } of groupMats.values()) if (!base[m.name]) base[m.name] = m;
+    const mat = (g, name, fallback) => {
+      const src = base[name] || fallback;
+      const k = g + ':' + name;
+      if (!groupMats.has(k)) { const c = src.clone(); c.emissive = new THREE.Color(0xe8b86b); c.emissiveIntensity = 0; groupMats.set(k, { g, m: c }); }
+      return groupMats.get(k).m;
+    };
+    const rubber = new THREE.MeshStandardMaterial({ name: 'rubber', color: 0x2b2d2e, roughness: 0.85 });
+    const make = (g) => { const n = new THREE.Group(); n.name = g; rig.add(n); nodes[g] = n; return n; };
+    const put = (n, geo, m, x = 0, y = 0, z = 0, rx = 0, ry = 0, rz = 0) => {
+      const mesh = new THREE.Mesh(geo, m); mesh.position.set(x, y, z); mesh.rotation.set(rx, ry, rz);
+      mesh.castShadow = true; mesh.receiveShadow = true; n.add(mesh); return mesh;
+    };
+    const lathe = (pts, seg = 48) => new THREE.LatheGeometry(pts.map(([r, y]) => new THREE.Vector2(r, y)), seg);
+    const dTop = home.drum.y - half.drum.y; // низ барабана
+    const front = half.shell.z + (home.shell ? home.shell.z : 0);
+
+    // сливной насос: улитка с крышкой фильтра спереди, моторчик сзади, патрубок вверх к баку
+    const pump = make('pump');
+    pump.position.set(home.filter.x - 0.06, bottomY + 0.27, front - 0.42);
+    const grey = mat('pump', 'grey'), steelP = mat('pump', 'steel'), white = mat('pump', 'plastic_white');
+    put(pump, lathe([[0, -0.07], [0.105, -0.07], [0.115, -0.05], [0.115, 0.05], [0.105, 0.07], [0, 0.07]]), grey, 0, 0, 0, Math.PI / 2);
+    put(pump, lathe([[0, 0], [0.075, 0], [0.08, 0.02], [0.08, 0.06], [0.065, 0.075], [0, 0.075]]), white, 0, 0, 0.07, Math.PI / 2);
+    put(pump, new THREE.CylinderGeometry(0.06, 0.06, 0.16, 40), steelP, 0, 0, -0.15, Math.PI / 2);
+    put(pump, new THREE.CylinderGeometry(0.062, 0.062, 0.02, 40), grey, 0, 0, -0.08, Math.PI / 2);
+    const inlet = new THREE.CatmullRomCurve3([new THREE.Vector3(0, 0.1, 0), new THREE.Vector3(0, 0.22, -0.02), new THREE.Vector3(0.05, 0.36, -0.1), new THREE.Vector3(0.08, dTop - pump.position.y + 0.02, -0.18)]);
+    put(pump, new THREE.TubeGeometry(inlet, 40, 0.032, 16, false), rubber);
+    const outlet = new THREE.CatmullRomCurve3([new THREE.Vector3(0.1, 0, -0.02), new THREE.Vector3(0.22, 0.02, -0.05), new THREE.Vector3(0.3, 0.08, -0.25)]);
+    put(pump, new THREE.TubeGeometry(outlet, 30, 0.022, 14, false), rubber);
+
+    // ТЭН: U-образная трубка под барабаном с фланцем и клеммами
+    const heater = make('heater');
+    heater.position.set(home.drum.x, dTop - 0.05, home.drum.z);
+    const steelH = mat('heater', 'steel'), greyH = mat('heater', 'grey');
+    const L = Math.min(0.55, half.drum.z * 0.9);
+    const u = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-0.07, 0, -L), new THREE.Vector3(-0.07, 0, L - 0.08), new THREE.Vector3(-0.045, 0, L - 0.015),
+      new THREE.Vector3(0, 0, L), new THREE.Vector3(0.045, 0, L - 0.015), new THREE.Vector3(0.07, 0, L - 0.08), new THREE.Vector3(0.07, 0, -L)], false, 'centripetal');
+    put(heater, new THREE.TubeGeometry(u, 120, 0.016, 16, false), steelH);
+    put(heater, new THREE.BoxGeometry(0.2, 0.09, 0.025), greyH, 0, 0, -L - 0.012);
+    for (const x of [-0.07, 0.07]) put(heater, new THREE.CylinderGeometry(0.009, 0.009, 0.05, 12), steelH, x, 0, -L - 0.045, Math.PI / 2);
+    put(heater, new THREE.CylinderGeometry(0.012, 0.012, 0.05, 12), greyH, 0, 0.02, -L - 0.045, Math.PI / 2);
+
+    // мотор с рёбрами, шкив и приводной ремень к шкиву барабана сзади
+    const motor = make('motor');
+    motor.position.set(home.drum.x + 0.38, bottomY + 0.34, home.drum.z - half.drum.z * 0.35);
+    const greyM = mat('motor', 'grey'), steelM = mat('motor', 'steel');
+    put(motor, lathe([[0, -0.19], [0.13, -0.19], [0.145, -0.17], [0.145, 0.17], [0.13, 0.19], [0, 0.19]]), greyM, 0, 0, 0, Math.PI / 2);
+    for (let i = -3; i <= 3; i++) put(motor, new THREE.TorusGeometry(0.147, 0.006, 8, 48), steelM, 0, 0, i * 0.045);
+    put(motor, new THREE.CylinderGeometry(0.012, 0.012, 0.12, 16), steelM, 0, 0, -0.25, Math.PI / 2);
+    const pulleyZ = -0.3;
+    put(motor, new THREE.CylinderGeometry(0.035, 0.035, 0.03, 32), steelM, 0, 0, pulleyZ, Math.PI / 2);
+    // ремень: от шкива мотора к большому шкиву за барабаном (центр барабана, задняя стенка)
+    const big = new THREE.Vector3(home.drum.x, home.drum.y, home.drum.z - half.drum.z - 0.03);
+    const m0 = new THREE.Vector3(motor.position.x, motor.position.y, motor.position.z + pulleyZ);
+    const R = Math.min(0.42, half.drum.y * 0.45), r = 0.035;
+    const zB = big.z;
+    const loop = [];
+    for (let i = 0; i <= 24; i++) { const a = Math.PI * (i / 24); loop.push(new THREE.Vector3(big.x + Math.cos(a) * R, big.y + Math.sin(a) * R, zB)); }
+    for (let i = 0; i <= 12; i++) { const a = Math.PI + Math.PI * (i / 12); loop.push(new THREE.Vector3(m0.x + Math.cos(a) * r, m0.y + Math.sin(a) * r, zB)); }
+    const beltGeo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(loop, true), 160, 0.008, 8, true);
+    const belt = new THREE.Mesh(beltGeo, rubber); belt.castShadow = true; motor.add(belt);
+    belt.position.sub(motor.position);
+    const bigWheel = new THREE.Mesh(new THREE.CylinderGeometry(R, R, 0.02, 64), steelM); bigWheel.rotation.x = Math.PI / 2;
+    bigWheel.position.copy(big).sub(motor.position); motor.add(bigWheel);
+
+    for (const g of ['pump', 'heater', 'motor']) {
+      const b = new THREE.Box3().setFromObject(nodes[g]);
+      home[g] = nodes[g].position.clone();
+      half[g] = b.getSize(new THREE.Vector3()).multiplyScalar(0.5);
+      nodes[g].userData.center = b.getCenter(new THREE.Vector3()).sub(nodes[g].position);
+    }
+  }
+
   // подписи
   const tagEls = TAGS.map((t) => {
     const el = document.createElement('div');
@@ -214,7 +299,10 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
     nodes.drum.position.set(home.drum.x, home.drum.y + d * 0.18, home.drum.z + d * 1.7);
     const run = reduced ? 0 : (1 - ease(0.03, 0.1, p)) * 0.6 + d * 0.5 + ease(0.92, 0.99, p) * 0.6;
     nodes.drum.rotation.z += run * 0.025;
-    const low = ease(0.58, 0.7, p) * b;
+    const a1 = ease(0.57, 0.63, p) * b, a2 = ease(0.65, 0.71, p) * b, low = ease(0.74, 0.8, p) * b;
+    nodes.pump.position.set(home.pump.x - a1 * 0.35, home.pump.y + a1 * 0.05, home.pump.z + a1 * 1.15);
+    nodes.heater.position.set(home.heater.x, home.heater.y - a2 * 0.12, home.heater.z + a2 * 1.35);
+    nodes.motor.position.set(home.motor.x + a2 * 0.9, home.motor.y - a2 * 0.05, home.motor.z + a2 * 0.35);
     // лючок фильтра остаётся на своём месте внизу спереди — только подсвечивается (раньше улетал и выглядел мусором)
     nodes.hoses.position.set(home.hoses.x - low * 0.9, home.hoses.y - low * 0.1, home.hoses.z - low * 0.5);
     nodes.feet.position.y = home.feet.y - low * 0.45;
@@ -293,7 +381,7 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
       if (vis > 0.5 && on < 0) on = faultIndex[t.part] ?? -1;
       glow[t.part] = Math.max(glow[t.part] || 0, vis);
     });
-    for (const { g, m } of groupMats.values()) m.emissiveIntensity = (glow[g] || 0) * (0.55 + 0.25 * Math.sin(clock.elapsedTime * 3));
+    for (const { g, m } of groupMats.values()) m.emissiveIntensity = (glow[g] || 0) * (0.32 + 0.12 * Math.sin(clock.elapsedTime * 3));
     for (const k in glow) glow[k] = 0;
     if (on !== active) {
       active = on;

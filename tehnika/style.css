@@ -101,7 +101,7 @@ body.menu-open .menu-btn { border-color: var(--on-ink); color: var(--on-ink); }
 .legend { position: absolute; right: var(--gr); top: 50%; transform: translateY(-50%); width: 290px; }
 .legend__title { font: 400 12px var(--mono); color: var(--muted); margin: 0 0 10px; letter-spacing: .02em; }
 .faults { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
-.fault { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 11px 0; border-bottom: 1px solid var(--line); opacity: .45; transition: opacity .35s; }
+.fault { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 8px 0; border-bottom: 1px solid var(--line); opacity: .45; transition: opacity .35s; }
 .fault b { font-weight: 500; font-size: 15px; }
 .fault span { grid-column: 1 / -1; font: 400 12px var(--mono); color: var(--muted); max-height: 0; overflow: hidden; transition: max-height .4s ease; }
 .fault em { grid-row: 1; grid-column: 2; font: 400 13px var(--mono); color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
