@@ -73,7 +73,7 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
   catch (e) { onFail(e); return; }
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, coarse ? 1.5 : 2));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.0;
+  renderer.toneMappingExposure = 0.95;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -86,7 +86,7 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
   key.shadow.mapSize.set(coarse ? 1024 : 2048, coarse ? 1024 : 2048);
   Object.assign(key.shadow.camera, { left: -4, right: 4, top: 4, bottom: -4, near: 1, far: 20 });
   key.shadow.bias = -0.0004; key.shadow.radius = 5;
-  const rim = new THREE.DirectionalLight(0xe2eaff, 1.2); rim.position.set(-6, 4, -5);
+  const rim = new THREE.DirectionalLight(0xfff1dc, 2.2); rim.position.set(-6, 4, -5);
   scene.add(key, rim, new THREE.HemisphereLight(0xffffff, 0xc4cad0, 0.3));
 
   const loader = new GLTFLoader();
@@ -118,7 +118,7 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
     } else {
       // у каждой группы свои копии материалов — чтобы подсвечивать только ту деталь, о которой подпись
       const k = g + m.uuid;
-      if (!groupMats.has(k)) { const c = m.clone(); c.emissive = new THREE.Color(0x2457d6); c.emissiveIntensity = 0; groupMats.set(k, { g, m: c }); }
+      if (!groupMats.has(k)) { const c = m.clone(); c.emissive = new THREE.Color(0xe8b86b); c.emissiveIntensity = 0; groupMats.set(k, { g, m: c }); }
       o.material = groupMats.get(k).m;
     }
   });
@@ -163,12 +163,12 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
   const bottomY = -1.4;
 
   // «рентген»: тонкие линии по граням корпуса
-  const xray = new THREE.LineBasicMaterial({ color: 0x2457d6, transparent: true, opacity: 0, depthWrite: false });
+  const xray = new THREE.LineBasicMaterial({ color: 0xf9f4eb, transparent: true, opacity: 0, depthWrite: false });
   for (const o of lists.shell || []) {
     if (o.geometry.attributes.position.count > 8000) continue;
     o.add(new THREE.LineSegments(new THREE.EdgesGeometry(o.geometry, 30), xray));
   }
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({ opacity: 0.15 }));
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({ opacity: 0.45 }));
   floor.rotation.x = -Math.PI / 2; floor.position.y = bottomY - 0.005; floor.receiveShadow = true; scene.add(floor);
 
   // подписи
@@ -190,8 +190,8 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
     nodes.top.position.y = home.top.y + lift * 0.75 * H * 0.45;
     nodes.panel.position.set(home.panel.x, home.panel.y + lift * 0.42, home.panel.z + lift * 0.7);
     const xr = ease(0.3, 0.42, p) * b;
-    for (const m of shellMats.values()) { m.opacity = 1 - xr * 0.88; m.depthWrite = xr < 0.5; }
-    xray.opacity = xr * 0.6;
+    for (const m of shellMats.values()) { m.opacity = 1 - xr * 0.9; m.depthWrite = xr < 0.5; }
+    xray.opacity = xr * 0.42;
     const d = ease(0.42, 0.56, p) * (1 - ease(0.6, 0.66, p)) * b;
     nodes.drum.position.set(home.drum.x, home.drum.y + d * 0.18, home.drum.z + d * 1.7);
     const run = reduced ? 0 : (1 - ease(0.03, 0.1, p)) * 0.6 + d * 0.5 + ease(0.92, 0.99, p) * 0.6;
