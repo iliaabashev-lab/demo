@@ -6,6 +6,10 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 const clamp01 = (x) => Math.min(1, Math.max(0, x));
 const ease = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
@@ -81,6 +85,18 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.03).texture;
+  // фон — то же пятно света, что было в CSS, но внутри сцены: так его не ломает постобработка
+  {
+    const c = document.createElement('canvas'); c.width = 1024; c.height = 640;
+    const g = c.getContext('2d');
+    const grd = g.createRadialGradient(640, 320, 0, 640, 320, 620);
+    // при постобработке тон-маппинг проходит и по фону, поэтому для неё фон светлее, чтобы на экране совпасть с CSS
+    const ao = !matchMedia('(pointer: coarse)').matches && innerWidth > 860 && !new URLSearchParams(location.search).has('noao');
+    const [c0, c1, c2] = ao ? ['#4B5151', '#383C3C', '#262929'] : ['#2E3232', '#232626', '#1A1C1C'];
+    grd.addColorStop(0, c0); grd.addColorStop(0.4, c1); grd.addColorStop(1, c2);
+    g.fillStyle = grd; g.fillRect(0, 0, 1024, 640);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; scene.background = t;
+  }
   const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
   const key = new THREE.DirectionalLight(0xffffff, 2.2);
   key.position.set(3.5, 7, 5); key.castShadow = true;
@@ -193,6 +209,7 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
     const xr = ease(0.3, 0.42, p) * b;
     for (const m of shellMats.values()) { m.opacity = 1 - xr * 0.9; m.depthWrite = xr < 0.5; }
     xray.opacity = xr * 0.42;
+    if (gtao) gtao.blendIntensity = 1 - xr; // в «рентгене» затенение прозрачного корпуса только мешает
     const d = ease(0.42, 0.56, p) * (1 - ease(0.6, 0.66, p)) * b;
     nodes.drum.position.set(home.drum.x, home.drum.y + d * 0.18, home.drum.z + d * 1.7);
     const run = reduced ? 0 : (1 - ease(0.03, 0.1, p)) * 0.6 + d * 0.5 + ease(0.92, 0.99, p) * 0.6;
@@ -210,9 +227,23 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
   if (fine && !reduced) addEventListener('pointermove', (e) => { pointer.x = e.clientX / innerWidth - 0.5; pointer.y = e.clientY / innerHeight - 0.5; }, { passive: true });
 
   let w = 1, h = 1;
+  // затенение в углах и стыках (GTAO), как во вьюере Sketchfab. На телефонах и слабых машинах выключено.
+  const aoOn = !coarse && !narrow() && (navigator.hardwareConcurrency || 4) >= 4 && !new URLSearchParams(location.search).has('noao');
+  let composer = null, gtao = null;
+  if (aoOn) {
+    composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    gtao = new GTAOPass(scene, camera, 1, 1);
+    gtao.updateGtaoMaterial({ radius: 0.22, distanceExponent: 1.4, thickness: 1.2, scale: 1.15, samples: 16 });
+    gtao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 6, rings: 2, samples: 16 });
+    gtao.blendIntensity = 1;
+    composer.addPass(gtao);
+    composer.addPass(new OutputPass());
+  }
   const resize = () => {
     const r = canvas.getBoundingClientRect(); w = Math.max(1, r.width); h = Math.max(1, r.height);
     renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+    if (composer) { composer.setPixelRatio(renderer.getPixelRatio()); composer.setSize(w, h); }
   };
   resize(); addEventListener('resize', resize);
   let visible = true;
@@ -268,7 +299,7 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
       faults.forEach((f2, i) => f2.classList.toggle('is-on', i === on));
       if (on >= 0 && narrow()) { const f2 = faults[on], strip = f2.parentElement; strip.scrollTo({ left: f2.offsetLeft - (strip.clientWidth - f2.clientWidth) / 2, behavior: reduced ? 'auto' : 'smooth' }); }
     }
-    renderer.render(scene, camera);
+    if (composer) composer.render(); else renderer.render(scene, camera);
     if (first) { first = false; onReady(); }
   }
   if (renderer.compileAsync) await renderer.compileAsync(scene, camera).catch(() => {});
