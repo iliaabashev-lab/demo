@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Мастерская на дому — ремонт бытовой техники</title>
+  <title>Мастерская на дому — ремонт стиральных машин</title>
   <meta name="description" content="Ремонт стиральных машин, холодильников и посудомоек у вас дома. Мастер приезжает в день заявки и называет цену до начала работы.">
   <meta name="robots" content="noindex, nofollow">
-  <meta name="theme-color" content="#E8ECEE">
+  <meta name="theme-color" content="#EEF0F2">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Unbounded:wght@500;700;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geologica:wght@200;300;400;500;600&display=swap">
   <link rel="stylesheet" href="./style.css">
+  <link rel="preload" href="./model/tehnika.glb" as="fetch" crossorigin>
   <script>
     (function () {
       var r = document.documentElement;
@@ -27,78 +28,67 @@
   </script>
 </head>
 <body>
-  <div class="demo-ribbon" aria-hidden="true">Демо-версия · заявки не отправляются</div>
-
   <header class="top">
     <a class="logo" href="#top" aria-label="Мастерская на дому, наверх">
-      <span class="logo__mark" aria-hidden="true"></span>
-      <span class="logo__text">Мастерская<br>на дому</span>
+      <svg class="logo__mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="2" width="26" height="28" rx="5"/><circle cx="16" cy="18" r="7.5"/><line x1="7" y1="8" x2="13" y2="8"/></svg>
+      <span class="logo__text">Мастерская на дому</span>
     </a>
     <a class="top__phone" href="tel:+79000000000">+7 900 000-00-00</a>
-    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu">
-      <span class="menu-btn__lines" aria-hidden="true"></span><span class="menu-btn__label">Меню</span>
-    </button>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu"><span class="menu-btn__label">Меню</span><span class="menu-btn__lines" aria-hidden="true"></span></button>
   </header>
 
   <nav class="menu" id="menu" aria-label="Разделы сайта">
     <ol class="menu__list">
-      <li><a class="menu__link" href="#razbor"><span class="reveal" data-alt="Что ломается чаще всего">Как устроена поломка</span></a></li>
+      <li><a class="menu__link" href="#razbor"><span class="reveal" data-alt="Узнать свою поломку">Что ломается</span></a></li>
       <li><a class="menu__link" href="#ceny"><span class="reveal" data-alt="Посчитать до звонка">Цены</span></a></li>
       <li><a class="menu__link" href="#pochemu"><span class="reveal" data-alt="Выезд, запчасти, гарантия">Почему мы</span></a></li>
       <li><a class="menu__link" href="#shagi"><span class="reveal" data-alt="Пять шагов до гарантии">Как работаем</span></a></li>
       <li><a class="menu__link" href="#zayavka"><span class="reveal" data-alt="Мастер приедет сегодня">Вызвать мастера</span></a></li>
     </ol>
-    <p class="menu__contact">Звоните с 8:00 до 22:00 · <a href="tel:+79000000000">+7 900 000-00-00</a></p>
+    <p class="menu__contact">Принимаем заявки с 8:00 до 22:00 · <a href="tel:+79000000000">+7 900 000-00-00</a></p>
   </nav>
 
   <main id="top">
-    <section class="hero" aria-labelledby="hero-title">
-      <h1 class="hero__title" id="hero-title">
-        <span class="hero__line">Ремонт</span>
-        <span class="hero__line hero__swap" aria-live="off"><span class="swap" data-words="стиральных машин|холодильников|посудомоек|духовых шкафов">стиральных машин</span></span>
-        <span class="hero__line">у вас дома</span>
-      </h1>
-      <p class="hero__lede">Мастер приезжает в день заявки, называет цену до начала работы и чинит на месте. Запчасти привозит с собой.</p>
-      <div class="hero__actions">
-        <a class="btn btn--main" href="#zayavka">Вызвать мастера</a>
-        <a class="btn btn--ghost" href="#razbor">Что сломалось?</a>
-      </div>
-      <p class="hero__hint">Прокрутите вниз — разберём машину и покажем, что обычно ломается</p>
-    </section>
-
-    <section class="razbor" id="razbor" aria-labelledby="razbor-title">
+    <section class="razbor" id="razbor" aria-labelledby="hero-title">
       <div class="razbor__sticky">
         <div class="stage" aria-hidden="true">
           <canvas class="stage__canvas"></canvas>
           <div class="stage__labels"></div>
         </div>
-        <svg class="poster" viewBox="0 0 300 360" role="img" aria-label="Стиральная машина: дверца, барабан, насос, ТЭН и мотор">
-          <rect x="40" y="20" width="220" height="300" rx="16" fill="#F7F9FA" stroke="#8C99A4" stroke-width="3"/>
-          <rect x="40" y="20" width="220" height="56" rx="16" fill="#DDE3E7"/>
-          <circle cx="215" cy="48" r="13" fill="#C7CFD5" stroke="#8C99A4" stroke-width="2"/>
-          <rect x="60" y="38" width="70" height="20" rx="4" fill="#15202A"/>
-          <circle cx="150" cy="190" r="82" fill="#C7CFD5" stroke="#8C99A4" stroke-width="10"/>
-          <circle cx="150" cy="190" r="58" fill="#A9C4E6" opacity=".7"/>
-          <rect x="60" y="300" width="40" height="10" rx="3" fill="#E39A16"/>
-        </svg>
-        <div class="razbor__head">
-          <h2 class="section-title" id="razbor-title">Что обычно ломается</h2>
-          <p class="razbor__lede">Узнайте свою поломку по признаку. Цены примерные, точную мастер назовёт после диагностики.</p>
+
+        <div class="hero" data-fade>
+          <h1 class="hero__title" id="hero-title">
+            Ремонт <span class="swap" data-words="стиральных машин|холодильников|посудомоек|духовых шкафов">стиральных машин</span>у вас дома
+          </h1>
+          <p class="hero__lede">Мастер приезжает в день заявки, называет цену до начала работы и чинит на месте. Запчасти привозит с собой.</p>
+          <div class="hero__actions">
+            <a class="btn btn--main" href="#zayavka">Вызвать мастера</a>
+            <a class="btn btn--line" href="#ceny">Узнать цену</a>
+          </div>
         </div>
-        <ol class="faults" aria-label="Частые поломки и цены">
-          <li class="fault" data-part="door"><b>Дверца и манжета</b><span>Течёт из-под дверцы, не закрывается люк</span><em>от 1 500 ₽</em></li>
-          <li class="fault" data-part="drum"><b>Подшипники и сальник</b><span>Гудит и стучит на отжиме</span><em>от 4 500 ₽</em></li>
-          <li class="fault" data-part="pump"><b>Сливной насос</b><span>Не сливает воду, ошибка слива</span><em>от 2 000 ₽</em></li>
-          <li class="fault" data-part="heater"><b>ТЭН</b><span>Стирает в холодной воде</span><em>от 2 500 ₽</em></li>
-          <li class="fault" data-part="motor"><b>Мотор и щётки</b><span>Барабан не крутится, пахнет гарью</span><em>от 3 000 ₽</em></li>
-          <li class="fault" data-part="board"><b>Модуль управления</b><span>Не включается, мигают все лампы</span><em>от 3 500 ₽</em></li>
-        </ol>
+        <p class="scroll-hint" data-fade><span aria-hidden="true"></span>Листайте — разберём машину и покажем, что в ней ломается</p>
+
+        <div class="legend">
+          <h2 class="legend__title">Что обычно ломается</h2>
+          <ol class="faults" aria-label="Частые поломки и цены">
+            <li class="fault" data-part="door"><b>Дверца и манжета</b><span>Течёт из-под люка, не закрывается</span><em>от 1 500 ₽</em></li>
+            <li class="fault" data-part="panel"><b>Модуль управления</b><span>Не включается, мигают индикаторы</span><em>от 3 500 ₽</em></li>
+            <li class="fault" data-part="drum"><b>Барабан и подшипники</b><span>Гул и стук на отжиме</span><em>от 4 500 ₽</em></li>
+            <li class="fault" data-part="filter"><b>Сливной фильтр и насос</b><span>Не сливает воду</span><em>от 2 000 ₽</em></li>
+            <li class="fault" data-part="hoses"><b>Шланги и патрубки</b><span>Лужа под машиной</span><em>от 1 200 ₽</em></li>
+            <li class="fault" data-part="feet"><b>Ножки и амортизаторы</b><span>Прыгает по полу при отжиме</span><em>от 1 800 ₽</em></li>
+          </ol>
+          <p class="legend__note">Цены примерные. Точную мастер назовёт после диагностики.</p>
+        </div>
       </div>
     </section>
 
     <section class="ceny" id="ceny" aria-labelledby="ceny-title">
       <div class="wrap">
-        <h2 class="section-title" id="ceny-title">Посчитайте ремонт до звонка</h2>
+        <div class="sec-head">
+          <h2 class="sec-title" id="ceny-title">Посчитайте ремонт до звонка</h2>
+          <p class="sec-lede">Выберите технику и отметьте, что с ней. Сумма — вместе с работой.</p>
+        </div>
         <div class="calc">
           <div class="calc__pick" role="radiogroup" aria-label="Какая техника">
             <button class="chip is-on" type="button" role="radio" aria-checked="true" data-kind="washer">Стиральная машина</button>
@@ -109,10 +99,10 @@
           <div class="calc__body">
             <svg class="calc__shape" viewBox="0 0 240 280" aria-hidden="true">
               <path class="shape-outline" d="M40 30 H200 Q215 30 215 45 V245 Q215 260 200 260 H40 Q25 260 25 245 V45 Q25 30 40 30 Z"/>
-              <g class="shape-detail" data-kind="washer"><circle cx="120" cy="160" r="58"/><circle cx="120" cy="160" r="40"/><line x1="40" y1="70" x2="200" y2="70"/><circle cx="180" cy="50" r="8"/></g>
-              <g class="shape-detail" data-kind="fridge"><line x1="40" y1="110" x2="200" y2="110"/><line x1="185" y1="60" x2="185" y2="90"/><line x1="185" y1="140" x2="185" y2="200"/></g>
-              <g class="shape-detail" data-kind="dish"><line x1="40" y1="70" x2="200" y2="70"/><rect x="80" y="84" width="80" height="10" rx="5"/><line x1="55" y1="230" x2="185" y2="230"/></g>
-              <g class="shape-detail" data-kind="oven"><rect x="50" y="100" width="140" height="120" rx="10"/><circle cx="70" cy="66" r="9"/><circle cx="100" cy="66" r="9"/><rect x="130" y="58" width="50" height="16" rx="3"/></g>
+              <g class="shape-detail" data-kind="washer"><circle cx="120" cy="160" r="58"/><circle cx="120" cy="160" r="42"/><line x1="25" y1="72" x2="215" y2="72"/><circle cx="182" cy="51" r="9"/><line x1="48" y1="51" x2="100" y2="51"/></g>
+              <g class="shape-detail" data-kind="fridge"><line x1="45" y1="104" x2="195" y2="104"/><line x1="178" y1="40" x2="178" y2="80"/><line x1="178" y1="130" x2="178" y2="200"/></g>
+              <g class="shape-detail" data-kind="dish"><line x1="25" y1="72" x2="215" y2="72"/><line x1="90" y1="90" x2="150" y2="90"/><line x1="48" y1="51" x2="120" y2="51"/></g>
+              <g class="shape-detail" data-kind="oven"><rect x="40" y="104" width="160" height="120" rx="8"/><circle cx="60" cy="80" r="8"/><circle cx="88" cy="80" r="8"/><line x1="130" y1="80" x2="190" y2="80"/></g>
             </svg>
             <fieldset class="calc__faults">
               <legend>Что случилось</legend>
@@ -120,7 +110,7 @@
             </fieldset>
           </div>
           <div class="calc__total">
-            <p><span class="calc__sum">от 0 ₽</span> <span class="calc__note">примерно, вместе с работой. Выезд и диагностика бесплатно, если ремонтируете у нас.</span></p>
+            <p><span class="calc__sum">от 0 ₽</span><span class="calc__note">Выезд и диагностика бесплатно, если ремонтируете у нас.</span></p>
             <a class="btn btn--main" href="#zayavka">Записаться с этим расчётом</a>
           </div>
         </div>
@@ -129,12 +119,12 @@
 
     <section class="pochemu" id="pochemu" aria-labelledby="pochemu-title">
       <div class="wrap">
-        <h2 class="section-title" id="pochemu-title">Почему нас пускают домой</h2>
+        <div class="sec-head"><h2 class="sec-title" id="pochemu-title">Почему нас пускают домой</h2></div>
         <ul class="cards">
           <li class="card"><svg class="card__icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M6 30h22l6-10h8v10h-4M10 34a4 4 0 1 0 8 0 4 4 0 1 0-8 0M30 34a4 4 0 1 0 8 0 4 4 0 1 0-8 0"/></svg><h3>Приедем сегодня</h3><p class="card__more">Заявка до 16:00 — мастер у вас в тот же день. Позже — завтра утром, время согласуем.</p></li>
           <li class="card"><svg class="card__icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 16h32v24H8zM16 16v-6h16v6M8 26h32"/></svg><h3>Запчасти с собой</h3><p class="card__more">Возим подшипники, насосы, ТЭНы и манжеты для популярных моделей. Большинство ремонтов — за один визит.</p></li>
           <li class="card"><svg class="card__icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6l14 6v10c0 9-6 16-14 20-8-4-14-11-14-20V12zM17 24l5 5 9-10"/></svg><h3>Гарантия на работу</h3><p class="card__more">Пишем гарантию в квитанцию. Если поломка вернулась, приедем и исправим бесплатно.</p></li>
-          <li class="card"><svg class="card__icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 12h32v24H8zM8 20h32M14 30h8"/></svg><h3>Цена до начала работы</h3><p class="card__more">Сначала диагностика и цена, потом ремонт. Не устроила сумма — заплатите только за выезд.</p></li>
+          <li class="card"><svg class="card__icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 12h32v24H8zM8 20h32M14 30h8"/></svg><h3>Цена до начала работы</h3><p class="card__more">Сначала диагностика и цена, потом ремонт. Не устроила сумма — платите только за выезд.</p></li>
         </ul>
       </div>
     </section>
@@ -153,7 +143,7 @@
 
     <section class="shagi" id="shagi" aria-labelledby="shagi-title">
       <div class="shagi__sticky">
-        <h2 class="section-title" id="shagi-title">Как проходит ремонт</h2>
+        <h2 class="sec-title" id="shagi-title">Как проходит ремонт</h2>
         <div class="orbit" aria-hidden="true">
           <div class="orbit__ring"><span class="orbit__dot" style="--i:0">1</span><span class="orbit__dot" style="--i:1">2</span><span class="orbit__dot" style="--i:2">3</span><span class="orbit__dot" style="--i:3">4</span><span class="orbit__dot" style="--i:4">5</span></div>
         </div>
@@ -168,13 +158,15 @@
     </section>
 
     <section class="zayavka" id="zayavka" aria-labelledby="zayavka-title">
-      <div class="wrap">
-        <h2 class="section-title" id="zayavka-title">Вызвать мастера</h2>
-        <p>Напишите, что за техника и что с ней. Мастер перезвонит и назовёт цену.</p>
-        <div class="zayavka__ways">
-          <a class="btn btn--main" href="#zayavka">Написать в Telegram</a>
-          <a class="btn btn--ghost" href="#zayavka">Написать в MAX</a>
-          <a class="btn btn--ghost" href="tel:+79000000000">Позвонить</a>
+      <div class="wrap zayavka__grid">
+        <div>
+          <h2 class="sec-title" id="zayavka-title">Вызвать мастера</h2>
+          <p class="sec-lede">Напишите, что за техника и что с ней. Мастер перезвонит и назовёт цену.</p>
+          <div class="zayavka__ways">
+            <a class="btn btn--main" href="#zayavka">Написать в Telegram</a>
+            <a class="btn btn--line" href="#zayavka">Написать в MAX</a>
+            <a class="btn btn--line" href="tel:+79000000000">Позвонить</a>
+          </div>
         </div>
         <form class="form" novalidate>
           <label for="f-phone">Телефон</label>
@@ -190,10 +182,11 @@
 
   <footer class="foot">
     <p>Мастерская на дому · ремонт бытовой техники · работаем по городу и области</p>
-    <p class="foot__credit">Сайт сделан в студии [название]</p>
+    <p class="foot__small">3D-модель: «Washing Machine (new)», автор nikita.bulgakov, лицензия CC BY 4.0 · Сайт сделан в студии [название]</p>
   </footer>
 
   <a class="sticky-cta" href="#zayavka">Вызвать мастера</a>
+  <div class="demo-pill" aria-hidden="true">Демо · заявки не отправляются</div>
 
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>

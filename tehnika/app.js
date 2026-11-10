@@ -152,6 +152,6 @@ function webglOk() {
 }
 if (!webglOk() || !gsap || !ST) fallback('нет WebGL или GSAP');
 else import('./scene.js').then((m) => m.start({ canvas: document.querySelector('.stage__canvas'), labels: document.querySelector('.stage__labels'),
-  faults, reduced, fine, narrow, gsap, ST, onReady: () => { root.dataset.state = 'ready'; ST.refresh(); }, onFail: fallback }))
+  faults, reduced, fine, narrow, gsap, ST, modelUrl: './model/tehnika.glb', onReady: () => { root.dataset.state = 'ready'; ST.refresh(); }, onFail: fallback }))
   .catch(fallback);
-setTimeout(() => { if (root.dataset.state === 'loading') fallback('сцена не успела загрузиться'); }, 15000);
+setTimeout(() => { if (root.dataset.state === 'loading') fallback('сцена не успела загрузиться'); }, 25000);
