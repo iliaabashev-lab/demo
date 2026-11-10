@@ -54,7 +54,7 @@ const TAGS = [
   { part: 'panel', from: 0.24, to: 0.4, side: 'left', at: [-0.6, 0.3, 0.6] },
   { part: 'drum', from: 0.46, to: 0.62, side: 'right', at: [0.4, 0.75, 0.2] },
   { part: 'filter', from: 0.62, to: 0.8, side: 'left', at: [0, 0, 1] },
-  { part: 'hoses', from: 0.66, to: 0.82, side: 'right', at: [0.6, 0.2, -0.6] },
+  { part: 'hoses', from: 0.66, to: 0.82, side: 'left', at: [-0.95, -0.2, 0] },
   { part: 'feet', from: 0.68, to: 0.82, side: 'left', at: [-0.8, -1, 0.8] },
 ];
 const TEXT = {
@@ -100,6 +100,7 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
   // 1) раскладываем меши по группам, материалы корпуса — свои (их делаем прозрачными)
   const lists = {};
   const shellMats = new Map();
+  const groupMats = new Map();
   model.traverse((o) => {
     if (!o.isMesh) return;
     o.castShadow = true; o.receiveShadow = true;
@@ -114,6 +115,11 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
     if (g === 'shell') {
       if (!shellMats.has(m.uuid)) { const c = m.clone(); c.transparent = true; shellMats.set(m.uuid, c); }
       o.material = shellMats.get(m.uuid);
+    } else {
+      // у каждой группы свои копии материалов — чтобы подсвечивать только ту деталь, о которой подпись
+      const k = g + m.uuid;
+      if (!groupMats.has(k)) { const c = m.clone(); c.emissive = new THREE.Color(0x2457d6); c.emissiveIntensity = 0; groupMats.set(k, { g, m: c }); }
+      o.material = groupMats.get(k).m;
     }
   });
 
@@ -191,8 +197,9 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
     const run = reduced ? 0 : (1 - ease(0.03, 0.1, p)) * 0.6 + d * 0.5 + ease(0.92, 0.99, p) * 0.6;
     nodes.drum.rotation.z += run * 0.025;
     const low = ease(0.58, 0.7, p) * b;
-    nodes.filter.position.set(home.filter.x, home.filter.y - low * 0.1, home.filter.z + low * 0.9);
-    nodes.hoses.position.set(home.hoses.x, home.hoses.y - low * 0.2, home.hoses.z - low * 0.9);
+    nodes.filter.position.set(home.filter.x, home.filter.y + low * 0.15, home.filter.z + low * 1.6);
+    nodes.filter.scale.setScalar(1 + low * 0.6);
+    nodes.hoses.position.set(home.hoses.x - low * 0.9, home.hoses.y - low * 0.1, home.hoses.z - low * 0.5);
     nodes.feet.position.y = home.feet.y - low * 0.45;
   }
 
@@ -215,6 +222,7 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
   const camPos = new THREE.Vector3(), camTgt = new THREE.Vector3(), tmp = new THREE.Vector3();
   const clock = new THREE.Clock();
   let first = true, active = -2;
+  const glow = {};
 
   function frame(force) {
     const dt = Math.min(0.05, clock.getDelta());
@@ -250,7 +258,10 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
       const dx = t.side === 'left' ? -el.offsetWidth + 6 : -6;
       el.style.transform = `translate3d(${(x + dx).toFixed(1)}px, ${(y - 6).toFixed(1)}px, 0)`;
       if (vis > 0.5 && on < 0) on = faultIndex[t.part] ?? -1;
+      glow[t.part] = Math.max(glow[t.part] || 0, vis);
     });
+    for (const { g, m } of groupMats.values()) m.emissiveIntensity = (glow[g] || 0) * (0.55 + 0.25 * Math.sin(clock.elapsedTime * 3));
+    for (const k in glow) glow[k] = 0;
     if (on !== active) {
       active = on;
       faults.forEach((f2, i) => f2.classList.toggle('is-on', i === on));
