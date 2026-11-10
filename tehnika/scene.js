@@ -25,7 +25,7 @@ const GROUPS = {
     'pSphere23', 'pSphere24', 'pSphere25', 'pSphere26', 'pSphere27', 'pSphere28', 'pSphere29'],
   drum: ['pCylinder1037', 'polySurface133', 'polySurface134', 'polySurface136', 'polySurface137', 'pCube51', 'pCube53', 'pCube54', 'pCylinder1038'],
   hoses: ['pCylinder1025', 'pHelix9', 'polySurface146', 'pCylinder1014', 'pCylinder1027'],
-  filter: ['polySurface122'],
+  filter: ['polySurface122', 'polySurface142'], // лючок фильтра (правая часть цоколя) и его защёлка
   feet: ['pCube45', 'pCube46', 'pCube47', 'pCube48', 'pCylinder1015', 'pCylinder1016', 'pCylinder1020', 'pCylinder1036',
     'pCylinder1017', 'pCylinder1018', 'pCylinder1019', 'pCylinder1021', 'pHelix5', 'pHelix6', 'pHelix7', 'pHelix8'],
 };
@@ -58,7 +58,7 @@ const TAGS = [
   { part: 'door', from: 0.12, to: 0.3, side: 'right', at: [0.6, 0.7, 0.4] },
   { part: 'panel', from: 0.24, to: 0.4, side: 'left', at: [-0.6, 0.3, 0.6] },
   { part: 'drum', from: 0.46, to: 0.62, side: 'right', at: [0.4, 0.75, 0.2] },
-  { part: 'filter', from: 0.62, to: 0.8, side: 'left', at: [0, 0, 1] },
+  { part: 'filter', from: 0.6, to: 0.76, side: 'left', at: [0, 0, 1] },
   { part: 'hoses', from: 0.66, to: 0.82, side: 'left', at: [-0.95, -0.2, 0] },
   { part: 'feet', from: 0.68, to: 0.82, side: 'left', at: [-0.8, -1, 0.8] },
 ];
@@ -66,7 +66,7 @@ const TEXT = {
   door: ['Дверца и манжета', 'Течёт из-под люка, не закрывается', 'от 1 500 ₽'],
   panel: ['Модуль управления', 'Не включается, мигают индикаторы', 'от 3 500 ₽'],
   drum: ['Барабан и подшипники', 'Гул и стук на отжиме', 'от 4 500 ₽'],
-  filter: ['Сливной фильтр и насос', 'Не сливает воду', 'от 2 000 ₽'],
+  filter: ['Сливной фильтр и насос', 'Не сливает воду. Фильтр — за лючком внизу, насос стоит за ним', 'от 2 000 ₽'],
   hoses: ['Шланги и патрубки', 'Лужа под машиной', 'от 1 200 ₽'],
   feet: ['Ножки и амортизаторы', 'Прыгает по полу при отжиме', 'от 1 800 ₽'],
 };
@@ -102,7 +102,7 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
   key.position.set(3.5, 7, 5); key.castShadow = true;
   key.shadow.mapSize.set(coarse ? 1024 : 2048, coarse ? 1024 : 2048);
   Object.assign(key.shadow.camera, { left: -4, right: 4, top: 4, bottom: -4, near: 1, far: 20 });
-  key.shadow.bias = -0.0004; key.shadow.radius = 5;
+  key.shadow.bias = -0.0002; key.shadow.normalBias = 0.025; key.shadow.radius = 5; // normalBias убирает полосатую рябь теней на гладкой эмали
   const rim = new THREE.DirectionalLight(0xfff1dc, 2.2); rim.position.set(-6, 4, -5);
   scene.add(key, rim, new THREE.HemisphereLight(0xffffff, 0xc4cad0, 0.3));
 
@@ -215,8 +215,7 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
     const run = reduced ? 0 : (1 - ease(0.03, 0.1, p)) * 0.6 + d * 0.5 + ease(0.92, 0.99, p) * 0.6;
     nodes.drum.rotation.z += run * 0.025;
     const low = ease(0.58, 0.7, p) * b;
-    nodes.filter.position.set(home.filter.x, home.filter.y + low * 0.15, home.filter.z + low * 1.6);
-    nodes.filter.scale.setScalar(1 + low * 0.6);
+    // лючок фильтра остаётся на своём месте внизу спереди — только подсвечивается (раньше улетал и выглядел мусором)
     nodes.hoses.position.set(home.hoses.x - low * 0.9, home.hoses.y - low * 0.1, home.hoses.z - low * 0.5);
     nodes.feet.position.y = home.feet.y - low * 0.45;
   }
@@ -231,11 +230,13 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
   const aoOn = !coarse && !narrow() && (navigator.hardwareConcurrency || 4) >= 4 && !new URLSearchParams(location.search).has('noao');
   let composer = null, gtao = null;
   if (aoOn) {
-    composer = new EffectComposer(renderer);
+    // свой буфер со сглаживанием MSAA ×4: без него постобработка даёт «лесенку» и мерцание краёв
+    const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 });
+    composer = new EffectComposer(renderer, rt);
     composer.addPass(new RenderPass(scene, camera));
     gtao = new GTAOPass(scene, camera, 1, 1);
     gtao.updateGtaoMaterial({ radius: 0.22, distanceExponent: 1.4, thickness: 1.2, scale: 1.15, samples: 16 });
-    gtao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 6, rings: 2, samples: 16 });
+    gtao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 10, rings: 3, samples: 24 }); // сильнее сглаживаем шум затенения
     gtao.blendIntensity = 1;
     composer.addPass(gtao);
     composer.addPass(new OutputPass());
@@ -305,5 +306,5 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
   if (renderer.compileAsync) await renderer.compileAsync(scene, camera).catch(() => {});
   renderer.setAnimationLoop(() => frame(false));
   document.addEventListener('visibilitychange', () => clock.getDelta());
-  if (new URLSearchParams(location.search).has('debug')) window.__scene = { s, nodes, half, lists: Object.fromEntries(Object.entries(lists).map(([k, v]) => [k, v.length])), go: (p) => { s.target = s.x = p; s.v = 0; frame(true); } };
+  if (new URLSearchParams(location.search).has('debug')) window.__scene = { only: (g) => { for (const [k, n] of Object.entries(nodes)) n.visible = !g || k === g; for (const m of shellMats.values()) m.opacity = 1; frame(true); }, s, nodes, half, lists: Object.fromEntries(Object.entries(lists).map(([k, v]) => [k, v.length])), go: (p) => { s.target = s.x = p; s.v = 0; frame(true); } };
 }
