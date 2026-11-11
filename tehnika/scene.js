@@ -145,7 +145,7 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
     } else {
       // у каждой группы свои копии материалов — чтобы подсвечивать только ту деталь, о которой подпись
       const k = g + m.uuid;
-      if (!groupMats.has(k)) { const c = m.clone(); c.emissive = new THREE.Color(0xe8b86b); c.emissiveIntensity = 0; groupMats.set(k, { g, m: c }); }
+      if (!groupMats.has(k)) { const c = m.clone(); c.emissive = new THREE.Color(0xffffff); c.emissiveIntensity = 0; groupMats.set(k, { g, m: c }); }
       o.material = groupMats.get(k).m;
     }
   });
@@ -207,7 +207,7 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
     const mat = (g, name, fallback) => {
       const src = base[name] || fallback;
       const k = g + ':' + name;
-      if (!groupMats.has(k)) { const c = src.clone(); c.emissive = new THREE.Color(0xe8b86b); c.emissiveIntensity = 0; groupMats.set(k, { g, m: c }); }
+      if (!groupMats.has(k)) { const c = src.clone(); c.emissive = new THREE.Color(0xffffff); c.emissiveIntensity = 0; groupMats.set(k, { g, m: c }); }
       return groupMats.get(k).m;
     };
     const rubber = new THREE.MeshStandardMaterial({ name: 'rubber', color: 0x2b2d2e, roughness: 0.85 });
@@ -395,7 +395,7 @@ export async function start({ canvas, labels, faults, reduced, fine, narrow, ST,
       if (vis > 0.5 && on < 0) on = faultIndex[t.part] ?? -1;
       glow[t.part] = Math.max(glow[t.part] || 0, vis);
     });
-    for (const { g, m } of groupMats.values()) m.emissiveIntensity = (glow[g] || 0) * (0.32 + 0.12 * Math.sin(clock.elapsedTime * 3));
+    for (const { g, m } of groupMats.values()) m.emissiveIntensity = (glow[g] || 0) * (0.06 + 0.03 * Math.sin(clock.elapsedTime * 2.5));
     for (const k in glow) glow[k] = 0;
     if (on !== active) {
       active = on;
