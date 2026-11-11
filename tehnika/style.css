@@ -60,7 +60,7 @@ body.menu-open .menu-btn { border-color: var(--on-ink); color: var(--on-ink); }
 .menu__link { display: flex; align-items: baseline; gap: 24px; padding: 16px 0; text-decoration: none; font: 500 clamp(30px, 6vw, 76px)/1.02 var(--f); letter-spacing: -.045em; }
 .menu__link::before { content: "0" counter(m); font: 400 13px var(--mono); color: #6E6A63; min-width: 22px; letter-spacing: 0; }
 .menu__contact { color: #6E6A63; margin: 24px 0 0; font: 400 14px var(--mono); }
-.reveal { position: relative; display: inline-block; overflow: hidden; vertical-align: bottom; transition: color .35s; }
+.reveal { position: relative; display: inline-block; clip-path: inset(0 -100vw 0 0); vertical-align: bottom; transition: color .35s; }
 .reveal::after { content: attr(data-alt); position: absolute; left: 0; top: 100%; white-space: nowrap; color: #9A6B1F; transition: transform .5s cubic-bezier(.6,0,.2,1); }
 @media (hover: hover) {
   a:hover > .reveal, a:focus-visible > .reveal { color: transparent; }
