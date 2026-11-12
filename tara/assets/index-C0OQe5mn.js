@@ -4467,16 +4467,22 @@ void main() {
   vec2 q = vUv - 0.5;
   vec3 soft = c * (1.0 - 0.5 * dot(q, q));
 
-  // граница первого экрана: выше точки, ниже обычный рендер, по самой границе сигнальная линия
-  float line = 1.0 - uSplit;
-  // над границей точки не обрываются, а редеют: обычный рендер проступает сквозь них полосой в четверть экрана
-  float band = 0.26 * smoothstep(1.0, 0.82, uSplit);
-  float keep = smoothstep(line, line + band + 0.0001, vUv.y);
-  float cell = bayer(floor(px / (uDot * 2.0)) + 2.0);
-  vec3 col = mix(soft, dots, step(line, vUv.y) * step(cell, keep * 1.05));
-  float edgeOn = step(0.002, uSplit) * step(uSplit, 0.998);
-  col = mix(col, uAccent, edgeOn * (1.0 - smoothstep(0.0, 0.0025, abs(vUv.y - line))));
-  col += uAccent * edgeOn * 0.3 * smoothstep(0.1, 0.0, abs(vUv.y - line));
+  // смена экрана: склад открывается, как секционные ворота. Кадр разбит на 14 створок,
+  // они поднимаются от центра к краям; под каждой створкой уже обычный рендер, по кромке сигнальная линия.
+  // uSplit: 1 — первый экран целиком, 0 — он ушёл вверх. Всё обратимо при прокрутке назад.
+  float t = 1.0 - uSplit;
+  float slat = floor(vUv.x * 14.0);
+  float delay = abs(slat - 6.5) / 14.0 * 0.55;
+  float open = smoothstep(0.0, 1.0, clamp(t * 1.65 - delay, 0.0, 1.0));
+  float edge = open * 1.03;
+  float moving = step(0.001, open) * step(open, 0.999);
+  vec3 col = mix(dots, soft, step(vUv.y, edge));
+  // кромка створки и свет из-под неё
+  col = mix(col, uAccent, moving * (1.0 - smoothstep(0.0, 0.004, abs(vUv.y - edge))));
+  col += uAccent * moving * 0.28 * smoothstep(0.12, 0.0, edge - vUv.y) * step(vUv.y, edge);
+  // тонкие стыки между створками, пока ворота в движении
+  float seam = 1.0 - smoothstep(0.0, 0.0012, abs(fract(vUv.x * 14.0) - 0.5) - 0.4985);
+  col *= 1.0 - 0.5 * seam * moving * step(edge, vUv.y);
 
   if (uLens > 1.0) {
     float d = distance(px, uMouse);
