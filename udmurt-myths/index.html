@@ -389,7 +389,7 @@ function tree(put){const segs=[],tips=[];
  ring(put,12,-2,1800,COL.ochre,.7,0,.05);ring(put,11.4,-2,1200,COL.red,.7,0,.05);
  for(let i=0;i<3000;i++){const r=Math.sqrt(rng())*11,a=rng()*TAU;put(Math.cos(a)*r,-2,Math.sin(a)*r,scl(COL.dim,.6),.55,0)}}
 function voices(put){for(let i=0;i<26000;i++){const r=Math.sqrt(rng())*13,a=rng()*TAU;put(Math.cos(a)*r,0,Math.sin(a)*r,mixc(COL.ochre,COL.linen,rng()),.9,25)}
- ball(put,0,.9,0,1.2,3000,COL.ember,1.3,0);
+ ball(put,0,.9,0,1.2,3000,COL.ember,1.3,34);
  for(let i=0;i<7000;i++){const a=rng()*TAU,r=rnd(.5,11);put(Math.cos(a)*r,rng()*8,Math.sin(a)*r,scl(COL.linen,.6),.7,30)}}
 function worlds(put){
  ring(put,9,16,3000,COL.ochre,.9,20,.06);ring(put,6.5,16,2000,COL.red,.9,20,.05);
@@ -401,10 +401,10 @@ function worlds(put){
  ring(put,11.2,-14,1600,COL.slate,.8,22,.05);
  line(put,[0,-14,0],[0,16,0],5000,COL.bark,.8,0,.12);
  for(let k=0;k<12;k++){const y=rnd(-12,14),a=rng()*TAU,d=y>0?1:-1;line(put,[0,y,0],[Math.cos(a)*3,y+2*d,Math.sin(a)*3],300,COL.bark,.6,0,.05)}}
+const PK=[[3,-3,4.6,2.4],[-4.5,1.5,3.3,2],[1.5,5,2.6,1.7],[-1,-6.5,2.2,1.6]],LK=[[-2.2,-1.2,1.6],[5.2,2.8,1.2]];
+const HI=(x,z)=>{const r=Math.hypot(x,z);let h=.35+1.1*Math.max(0,1-(r/12)**2);for(const[px,pz,ph,pr]of PK){const d=Math.hypot(x-px,z-pz);h+=ph*Math.exp(-((d/pr)**2))*(1+.25*(1-Math.abs(2*fbm(x*.6,z*.6)-1)))}h+=(fbm(x*.4+9,z*.4)-.5)*.5;for(const[lx,lz,lr]of LK)if(Math.hypot(x-lx,z-lz)<lr)h=Math.min(h,.45);return h};
 function creation(put){
- for(let z=-26;z<=26;z+=.6)for(let x=-26;x<=26;x+=.18){const e=1-sstep(19,26,Math.hypot(x,z));if(e<=0||rng()>e)continue;put(x+rnd(-.04,.04),0,z+rnd(-.08,.08),[95,140,155],1,1)}
- const PK=[[3,-3,4.6,2.4],[-4.5,1.5,3.3,2],[1.5,5,2.6,1.7],[-1,-6.5,2.2,1.6]],LK=[[-2.2,-1.2,1.6],[5.2,2.8,1.2]];
- const HI=(x,z)=>{const r=Math.hypot(x,z);let h=.35+1.1*Math.max(0,1-(r/12)**2);for(const[px,pz,ph,pr]of PK){const d=Math.hypot(x-px,z-pz);h+=ph*Math.exp(-((d/pr)**2))*(1+.25*(1-Math.abs(2*fbm(x*.6,z*.6)-1)))}h+=(fbm(x*.4+9,z*.4)-.5)*.5;for(const[lx,lz,lr]of LK)if(Math.hypot(x-lx,z-lz)<lr)h=Math.min(h,.45);return h};
+ for(let z=-20;z<=20;z+=.45)for(let x=-20;x<=20;x+=.075){const e=1-sstep(13,20,Math.hypot(x,z));if(e<=0||rng()>e)continue;put(x+rnd(-.02,.02),0,z+rnd(-.03,.03),[95,140,155],1,1)}
  for(let i=0;i<=170;i++)for(let j=0;j<=170;j++){const x=-12+i*24/170,z=-12+j*24/170,r=Math.hypot(x,z);if(r>12)continue;const H=HI(x,z),lake=LK.some(([lx,lz,lr])=>Math.hypot(x-lx,z-lz)<lr),beach=r>11.1;
   const c=lake?[70,120,140]:beach?[226,196,140]:H<1.2?mixc([150,160,90],[96,128,70],sstep(.5,1.2,H)):H<2.6?mixc([96,128,70],[150,140,128],sstep(1.4,2.6,H)):mixc([150,140,128],[245,240,232],sstep(2.8,3.8,H));
   put(x+rnd(-.03,.03),H,z+rnd(-.03,.03),c,lake?.9:1.15,2)}
@@ -488,9 +488,9 @@ const SHI=[0,1,2,3,4,5,6,7,8,9,10,2];
 /* --- шейдер облака точек --- */
 const U={uPA:{value:SH[0].tp},uPB:{value:SH[0].tp},uCA:{value:SH[0].tc},uCB:{value:SH[0].tc},uMix:{value:1},uTime:{value:0},uSize:{value:.072},uScale:{value:800},uInt:{value:.9},
  uMouse:{value:new THREE.Vector3(0,-999,0)},uMR:{value:3},uMouseOn:{value:0},uGrow:{value:0},uMount:{value:0},uRip:{value:-9},uSky:{value:0},uFire:{value:0},uRing:{value:0},uSel:{value:-1},
- uWheel:{value:0},uSeason:{value:0},uSCol:{value:new THREE.Color(.72,.77,.54)},uFall:{value:.7},uFocus:{value:-1},uStyle:{value:0},uLeaf:{value:-1},uFlare:{value:-1},uFocusD:{value:30},uDof:{value:.045},uClick:{value:[0,1,2,3].map(()=>new THREE.Vector4(0,0,0,-9))},uClickK:{value:new THREE.Vector4()}};
+ uWheel:{value:0},uSeason:{value:0},uSCol:{value:new THREE.Color(.72,.77,.54)},uFall:{value:.7},uFocus:{value:-1},uStyle:{value:0},uLeaf:{value:-1},uFlare:{value:-1},uAstro:{value:-1},uMoon:{value:0},uPuff:{value:-1},uFocusD:{value:30},uDof:{value:.045},uClick:{value:[0,1,2,3].map(()=>new THREE.Vector4(0,0,0,-9))},uClickK:{value:new THREE.Vector4()}};
 const VS=`precision highp float;
-uniform sampler2D uPA,uPB,uCA,uCB;uniform float uMix,uTime,uSize,uScale,uMR,uMouseOn,uGrow,uMount,uRip,uSky,uFire,uRing,uSel,uWheel,uSeason,uFall,uFocus;uniform vec3 uMouse,uSCol;uniform float uStyle,uLeaf,uFocusD,uDof,uFlare;uniform vec4 uClick[4];uniform vec4 uClickK;
+uniform sampler2D uPA,uPB,uCA,uCB;uniform float uMix,uTime,uSize,uScale,uMR,uMouseOn,uGrow,uMount,uRip,uSky,uFire,uRing,uSel,uWheel,uSeason,uFall,uFocus;uniform vec3 uMouse,uSCol;uniform float uStyle,uLeaf,uFocusD,uDof,uFlare,uAstro,uMoon,uPuff;uniform vec4 uClick[4];uniform vec4 uClickK;
 attribute vec2 ref;attribute float seed;varying vec3 vC;varying float vA;
 vec2 rot(vec2 v,float a){float c=cos(a),s=sin(a);return vec2(v.x*c+v.y*s,-v.x*s+v.y*c);}
 vec3 dyn(vec3 p,float g,float s,inout float br,inout vec3 col){
@@ -501,15 +501,15 @@ vec3 dyn(vec3 p,float g,float s,inout float br,inout vec3 col){
  if(g<4.5){br*=smoothstep(.45,1.,uSky)*2.6;return p;}
  if(g<5.5){br*=.45+1.3*pow(.5+.5*sin(p.x*1.1+p.z*.9-uTime*3.+s*.7),6.);return p;}
  if(g<6.5){float t=fract(s*6.7+uTime*(.9+s*.5));float fl=uFlare>0.?exp(-(uTime-uFlare)*1.1):0.;float tg=floor(s*5.);vec2 tc=vec2(cos(tg*1.26+uTime*.7),sin(tg*1.26+uTime*.7))*.16;float hg=1.5+.7*sin(uTime*3.1+tg*2.)+fl*2.2;p.y=.25+t*hg;vec2 b0=p.xz-vec2(0.,.1);p.xz=vec2(0.,.1)+mix(b0,tc,t*.7)*(1.-t*.8)+vec2(sin(uTime*6.+s*20.+t*5.),cos(uTime*5.+s*13.+t*4.))*.12*t;col=mix(vec3(1.,.96,.75),vec3(1.,.5,.12),smoothstep(.05,.45,t));col=mix(col,vec3(.75,.12,.04),smoothstep(.45,.9,t));br*=uFire*pow(1.-t,.7)*(1.4+fl);return p;}
- if(g<7.5){float t=fract(s*5.+uTime*.1);p.y=2.4+t*7.;p.x+=t*2.2+sin(t*6.+s*9.)*.6;p.z+=cos(t*5.+s*7.)*.5;br*=uFire*(1.-t)*.3;return p;}
+ if(g<7.5){float t=fract(s*5.+uTime*.1);p.y=2.4+t*7.;p.x+=t*2.2+sin(t*6.+s*9.)*.6;p.z+=cos(t*5.+s*7.)*.5;br*=max(uFire,uPuff>0.?exp(-(uTime-uPuff)*.7)*2.:0.)*(1.-t)*.3;return p;}
  if(g<13.5){p.xz=rot(p.xz,uRing);p.y+=sin(uTime+g)*.25;br*=uSel<0.?1.:(abs(g-8.-uSel)<.5?1.7:.28);return p;}
  if(g<17.5){p.xz=rot(p.xz,uWheel);br*=abs(g-14.-uSeason)<.5?1.7:.5;return p;}
  if(g<18.5){p.xz=rot(p.xz,uWheel);return p;}
  if(g<19.5){p.y=mod(p.y-uTime*uFall*(.6+s*.6),15.);col=uSCol*(.7+s*.5);br*=1.-p.y/15.;return p;}
- if(g<22.5){float k=g-20.;p.xz=rot(p.xz,uTime*.04*(k==1.?-1.:1.));br*=uFocus<0.?1.:(abs(k-uFocus)<.5?1.8:.3);return p;}
+ if(g<22.5){float k=g-20.;p.xz=rot(p.xz,uTime*.04*(k==1.?-1.:1.));br*=uFocus<0.?1.:(abs(k-uFocus)<.5?1.8:.3);float aa=uTime-uAstro;if(uAstro>0.&&aa<4.){float e=sin(clamp(aa/4.,0.,1.)*3.14159);float cy=k<.5?16.:(k<1.5?0.:-14.);vec3 q=p-vec3(0.,cy,0.);q.xz=rot(q.xz,e*e*6.2832*(k==1.?-1.:1.));q.yz=rot(q.yz,e*(k<.5?1.1:(k<1.5?-.9:.7)));q.xy=rot(q.xy,e*.5*(k-1.));p=q+vec3(0.,cy,0.);br*=1.+e*1.2;}return p;}
  if(g<23.5)return p;
  if(g<24.5){p.x+=sin(uTime*.25)*1.2;return p;}
- if(g<25.5){float r=length(p.xz);float w=pow(.5+.5*cos(r*2.2-uTime*1.6),10.);p.y+=w*.35;br*=(.15+1.5*w)*(1.-r/13.5);return p;}
+ if(g<25.5){float r=length(p.xz);float w=pow(.5+.5*cos(r*2.2-uTime*1.6),10.);p.y+=w*.35;br*=(.15+1.5*w)*(1.-r/13.5);col=mix(col,col.bbb*vec3(.62,.78,1.05),uMoon*.8);return p;}
  if(g<26.5){vec2 c=vec2(0.,-6.);p.xz=rot(p.xz-c,uTime*.05)+c;return p;}
  if(g<27.5){p.x+=sin(uTime*.8+p.y*.3)*.15;p.z+=cos(uTime*.6+p.y*.25)*.1;float la=uTime-uLeaf;if(uLeaf>0.&&la<5.){float e=la<2.6?smoothstep(0.,2.6,la+s*.6):1.-smoothstep(3.4,5.,la);vec3 gnd=vec3(p.x*1.25+sin(s*50.)*2.,-1.9,p.z*1.25+cos(s*40.)*2.);vec3 q=mix(p,gnd,e);q.x+=sin(la*3.+s*20.)*e*(1.-e)*3.;p=q;br*=1.+e*(1.-e)*2.;}return p;}
  if(g<28.5){br*=.35+1.2*pow(.5+.5*sin(p.y*1.4-uTime*3.+s*.5),6.);return p;}
@@ -518,6 +518,7 @@ vec3 dyn(vec3 p,float g,float s,inout float br,inout vec3 col){
  if(g<31.5){float t=fract(s*3.1+uTime*(.25+s*.2));float fl=uFlare>0.?exp(-(uTime-uFlare)*.9):0.;vec2 dr=vec2(cos(s*40.),sin(s*40.));float v=1.2+s*1.6+fl*2.;p.xz=vec2(0.,.1)+dr*t*(.6+s*1.2);p.y=.4+v*t*2.2-2.*t*t;col=vec3(1.,.55,.15);br*=uFire*(1.-t)*(1.3+fl*2.)*step(0.,p.y);return p;}
  if(g<32.5){br*=uFire*(.75+.25*sin(uTime*2.3+s*6.));return p;}
  if(g<33.5){float d=length(p-vec3(0.,.7,.1));col=mix(col,col*vec3(1.45,.9,.6),uFire*exp(-d*d*.2));br*=1.+uFire*1.6*exp(-d*d*.25);return p;}
+ if(g<34.5){vec3 q=p-vec3(0.,.9,0.);q*=mix(1.15,.95,uMoon);float sh=step(length(q.xy-vec2(.62,.18)),1.05);br*=1.-sh*smoothstep(.35,.75,uMoon);col=mix(vec3(1.,.62,.25)*1.4,vec3(.78,.87,1.)*1.25,uMoon);p=q+vec3(0.,.9,0.);return p;}
  return p;}
 void main(){vec4 a=texture2D(uPA,ref),b=texture2D(uPB,ref),ca=texture2D(uCA,ref),cb=texture2D(uCB,ref);
  float ga=floor(ca.a*255.+.5),gb=floor(cb.a*255.+.5),ba=1.,bb=1.;vec3 cola=ca.rgb,colb=cb.rgb;
@@ -542,7 +543,7 @@ void main(){vec4 a=texture2D(uPA,ref),b=texture2D(uPB,ref),ca=texture2D(uCA,ref)
   else if(ty<2.5){float w=exp(-pow(L-age*9.,2.)*.3)*fade;col=mix(col,vec3(1.,.45,.15)*(1.6+w),clamp(w*1.6,0.,1.));p.y+=w*.5;}
   else if(ty<3.5){if(abs(gc-1.)<.5){float fr=age*6.5,w=exp(-pow(Lx-fr,2.)*.15)*fade;p.y+=sin((Lx-fr)*2.)*w*1.2;col*=1.+w*3.;float sp=exp(-Lx*Lx*.5)*max(0.,sin(min(age*2.4,3.14159)));p.y+=sp*(2.5+seed*2.5);col*=1.+sp*2.5;}}
   else if(ty<4.5){float fr=age*6.,w=exp(-pow(Lx-fr,2.)*.35)*fade;p.y+=w*1.1;col=mix(col,vec3(1.,.93,.8)*2.,clamp(w*1.2,0.,1.));}
-  else if(ty<5.5){if(abs(gc-3.)<.5){vec2 d2=p.xz-c.xz;float op=smoothstep(0.,.7,age)*(1.-smoothstep(2.6,3.5,age));p.xz+=d2/max(Lx,.01)*exp(-Lx*Lx*.018)*op*10.;p.y+=exp(-Lx*Lx*.03)*op*3.;}if(abs(gc-4.)<.5)col*=1.+fade*2.;}
+  else if(ty<5.5){if(abs(gc-3.)<.5){vec2 d2=p.xz-c.xz;float op=smoothstep(0.,.15,age)*(1.-smoothstep(2.6,3.5,age));p.xz+=d2/max(Lx,.01)*exp(-Lx*Lx*.012)*op*12.;p.y+=exp(-Lx*Lx*.03)*op*3.;}if(abs(gc-4.)<.5)col*=1.+fade*2.;}
   else if(ty<6.5){float fr=age*12.,w=exp(-pow(Lx-fr,2.)*.3)*fade;col=mix(col,vec3(.95,.75,.3)*2.2,clamp(w*1.2,0.,1.));p.y+=w*.9;}
   else if(ty<7.5){float band=-15.+age*13.,w=exp(-pow(p.y-band,2.)*.35)*fade,ax=exp(-dot(p.xz,p.xz)*.6);col*=1.+w*(1.5+ax*5.);p.xz*=1.+w*.06;}
   else{float f=exp(-L*L*.1)*fade;p.y+=f*age*2.6*(.5+seed);p.xz=c.xz+rot(p.xz-c.xz,f*age*2.2);col=mix(col,vec3(1.,.82,.4)*2.2,clamp(f*1.3,0.,1.));}}
@@ -567,8 +568,13 @@ let haloObj=null,ptsObj=null;
 {const geo=new THREE.BufferGeometry(),ref=new Float32Array(NP*2),sd=new Float32Array(NP);
  for(let i=0;i<NP;i++){ref[i*2]=((i%TW)+.5)/TW;ref[i*2+1]=(Math.floor(i/TW)+.5)/TW;sd[i]=rng()}
  geo.setAttribute('position',new THREE.BufferAttribute(new Float32Array(NP*3),3));geo.setAttribute('ref',new THREE.BufferAttribute(ref,2));geo.setAttribute('seed',new THREE.BufferAttribute(sd,1));
- const pts=new THREE.Points(geo,new THREE.ShaderMaterial({uniforms:U,vertexShader:VS,fragmentShader:FS,transparent:true,depthWrite:false,depthTest:false,blending:THREE.AdditiveBlending}));pts.frustumCulled=false;ptsObj=pts;haloObj=new THREE.Points(geo,new THREE.ShaderMaterial({uniforms:U,vertexShader:VS,fragmentShader:FS,defines:{HALO:1},transparent:true,depthWrite:false,depthTest:false,blending:THREE.AdditiveBlending}));haloObj.frustumCulled=false;haloObj.renderOrder=-1;scene.add(haloObj,pts)}
+ const pts=new THREE.Points(geo,new THREE.ShaderMaterial({uniforms:U,vertexShader:VS,fragmentShader:FS,transparent:true,depthWrite:false,depthTest:true,blending:THREE.AdditiveBlending}));pts.frustumCulled=false;ptsObj=pts;haloObj=new THREE.Points(geo,new THREE.ShaderMaterial({uniforms:U,vertexShader:VS,fragmentShader:FS,defines:{HALO:1},transparent:true,depthWrite:false,depthTest:true,blending:THREE.AdditiveBlending}));haloObj.frustumCulled=false;haloObj.renderOrder=-1;scene.add(haloObj,pts)}
 
+/* --- сплошное тело острова и холмов: точки за горами не просвечивают --- */
+const OCCV=`attribute float h;uniform float uGrow,uMount,uMode;void main(){vec3 p=position;float y=h;if(uMode<.5){float r=length(p.xz),R=uGrow*12.6,m=(1.-smoothstep(R-1.5,R+.3,r))*step(.01,uGrow);y=mix(-3.,.4+(h-.4)*uMount,m);}gl_Position=projectionMatrix*modelViewMatrix*vec4(p.x,y-.12,p.z,1.);}`,OCCF=`void main(){gl_FragColor=vec4(.082,.063,.051,1.);}`;
+const occ=(size,seg,fh,mode)=>{const g=new THREE.PlaneGeometry(size,size,seg,seg);g.rotateX(-Math.PI/2);const P=g.attributes.position,H=new Float32Array(P.count);for(let i=0;i<P.count;i++)H[i]=fh(P.getX(i),P.getZ(i));g.setAttribute('h',new THREE.BufferAttribute(H,1));
+ const m=new THREE.Mesh(g,new THREE.ShaderMaterial({uniforms:{uGrow:U.uGrow,uMount:U.uMount,uMode:{value:mode}},vertexShader:OCCV,fragmentShader:OCCF}));m.visible=false;m.frustumCulled=false;scene.add(m);return m};
+const occC=occ(25,140,(x,z)=>Math.hypot(x,z)<=12.2?HI(x,z):-3,0),occI=occ(76,150,(x,z)=>hT(x,z),1);
 /* --- невидимые зоны нажатия --- */
 const hitMat=new THREE.MeshBasicMaterial({visible:false}),PICK=SL.map(()=>[]);
 const hit=(geo,x,y,z,parent=scene)=>{const m=new THREE.Mesh(geo,hitMat);m.position.set(x,y,z);parent.add(m);return m};
@@ -577,7 +583,6 @@ PICK[5].push({obj:hit(new THREE.CylinderGeometry(6.5,6.5,28,12),0,14,0),label:'�
 HLP.forEach(([x,z],k)=>PICK[6].push({obj:hit(new THREE.SphereGeometry(1.8,10,8),x,hT(x,z)+3.5,z),label:HL[k].n,act:()=>ACT.hill(k)}));
 const ringG=new THREE.Group(),wheelG=new THREE.Group();scene.add(ringG,wheelG);
 SP.forEach((s,k)=>{const a=k/6*TAU,m=hit(new THREE.PlaneGeometry(3.8,3.8),Math.sin(a)*7.5,3.6,Math.cos(a)*7.5,ringG);m.rotation.y=a;m.material=new THREE.MeshBasicMaterial({visible:false,side:THREE.DoubleSide});PICK[7].push({obj:m,label:s.n+' · '+s.k,act:()=>ACT.spirit(k)})});
-PICK[8].push({obj:hit(new THREE.BoxGeometry(4.2,3.6,3.6),0,1.6,0),label:'Куала · очаг',act:()=>ACT.fire()});
 SE.forEach((s,k)=>{const a=k*Math.PI/2;PICK[9].push({obj:hit(new THREE.SphereGeometry(2,10,8),Math.sin(a)*9.2,1.9,Math.cos(a)*9.2,wheelG),label:s.k+' · '+s.n,act:()=>ACT.season(k)})});
 
 /* --- камера: позы слайдов, перелёт с дугой --- */
@@ -598,7 +603,7 @@ addEventListener('pointermove',e=>{const d=S.dbg;if(!d.drag)return;const dx=e.cl
 glc.addEventListener('wheel',e=>{if(S.dbg.on)S.dbg.r=clamp(S.dbg.r*(1+e.deltaY*.001),3,250)},{passive:true});
 
 S.orb={th:0,ph:0,vth:0,drag:false};S.shake=0;let dX=0,dY=0,isDown=false,ck=0,trN=0,vpH=null,ringA=0,wheelA=0,ringVel=0,wheelVel=0,hintS=-1;const PY=[null,0,null,0,4.2,0,1.5,null,null,0,2,null],UPV0=new THREE.Vector3(0,1,0);
-const HINT=['светлячки и листопад','пустить свой голос','свет по мировому дереву','круги на воде','разогнать облака','шаг великанши','дозор: волна по холмам','закружить духов','раздуть огонь','раскрутить колесо года','звёздная воронка','свет по ярусам'],CTY=[8,4,7,3,5,0,6,4,2,1,1,7],fxt=$('#fxt'),COARSE=matchMedia('(pointer:coarse)').matches;
+const HINT=['светлячки и листопад','день и ночь','раскрутить ярусы мира','круги на воде','разогнать облака','шаг великанши','дозор: волна по холмам','закружить духов','зажечь или погасить огонь','раскрутить колесо года','звёздная воронка','раскрутить ярусы мира'],CTY=[8,4,-1,3,5,0,6,4,2,1,1,-1],fxt=$('#fxt'),COARSE=matchMedia('(pointer:coarse)').matches;
 glc.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'||S.dbg.on||e.button!==0)return;isDown=true;dX=e.clientX;dY=e.clientY});
 addEventListener('pointermove',e=>{if(!isDown)return;if(!S.orb.drag&&Math.hypot(e.clientX-dX,e.clientY-dY)>6){S.orb.drag=true}if(S.orb.drag){S.orb.th-=e.movementX*.005;S.orb.vth=-e.movementX*.3;S.orb.ph=clamp(S.orb.ph+e.movementY*.003,-.35,.5)}});
 addEventListener('pointerup',()=>{isDown=false;S.orb.drag=false});
@@ -607,8 +612,9 @@ window.__fx=(x,y)=>{ndc.set(x/innerWidth*2-1,-(y/innerHeight)*2+1);ray.setFromCa
  if(!ray.ray.intersectPlane(plane,pt)){cam.getWorldDirection(tmp);plane.setFromNormalAndCoplanarPoint(tmp,_t);if(!ray.ray.intersectPlane(plane,pt))pt.copy(_t)}
  const t=U.uTime.value;
  if(i===0&&!(U.uLeaf.value>0&&t-U.uLeaf.value<5))U.uLeaf.value=t;
- if(i===7)ringVel+=5;if(i===9)wheelVel+=4.5;if(i===8){if(!S.fireOn)ACT.fire();U.uFlare.value=t}
- U.uClick.value[ck].set(pt.x,pt.y,pt.z,t);U.uClickK.value.setComponent(ck,CTY[i]);ck=(ck+1)%4;
+ if(i===7)ringVel+=5;if(i===9)wheelVel+=4.5;if((i===2||i===11)&&t-U.uAstro.value>4)U.uAstro.value=t;if(i===1)S.moon=!S.moon;
+ let ty=CTY[i];if(i===8){ACT.fire();if(S.fireOn)U.uFlare.value=t;else{U.uPuff.value=t;ty=-1}}
+ if(ty>=0){U.uClick.value[ck].set(pt.x,pt.y,pt.z,t);U.uClickK.value.setComponent(ck,ty);ck=(ck+1)%4}
  S.shake=Math.max(S.shake,i===5?1.2:.3)};
 /* --- кадр --- */
 const clock=new THREE.Clock(),_p=new THREE.Vector3(),_t=new THREE.Vector3(),_p2=new THREE.Vector3(),_t2=new THREE.Vector3(),p0=new THREE.Vector3(),t0=new THREE.Vector3();
@@ -638,7 +644,7 @@ function tick(now){const dt=Math.min(clock.getDelta(),.05),tm=clock.elapsedTime;
  U.uGrow.value=t<0?c.g0*(-t/1.2):sstep(2.4,5,t)*.55+sstep(5.2,8,t)*.45;U.uMount.value=t<0?c.g0*(-t/1.2):sstep(5.4,8.6,t);U.uRip.value=c.run&&t>0&&t<3?t*5:-9;
  if(S.skyHold||S.skyAuto)S.sky=Math.min(1,S.sky+dt*.42);else if(!S.skyDone)S.sky=Math.max(0,S.sky-dt*.3);
  if(S.sky>=1&&!S.skyDone){S.skyDone=true;S.skyAuto=false;S.skyHold=false;uiSky(true)}holdBtn.style.setProperty('--k',S.sky.toFixed(3));U.uSky.value=ease(S.sky);
- S.fire=lerp(S.fire,S.fireOn?1:0,Math.min(dt*2,1));U.uFire.value=S.fire;
+ S.fire=lerp(S.fire,S.fireOn?1:0,Math.min(dt*2,1));U.uFire.value=S.fire;U.uMoon.value=lerp(U.uMoon.value,S.moon?1:0,Math.min(dt*2.5,1));occC.visible=shB===3&&mixT>.85;occI.visible=shB===6&&mixT>.85;
  ringA+=(S.sp>=0?angD(-S.sp/6*TAU,ringA)*Math.min(dt*3,1):dt*.12)+ringVel*dt;ringVel*=Math.pow(.3,dt);U.uRing.value=ringA;ringG.rotation.y=ringA;U.uSel.value=S.sp;
  wheelA+=(Math.abs(wheelVel)<.5?angD(-S.season*Math.PI/2,wheelA)*Math.min(dt*2.2,1):0)+wheelVel*dt;wheelVel*=Math.pow(.3,dt);U.uWheel.value=wheelA;wheelG.rotation.y=wheelA;U.uSeason.value=S.season;
  U.uSCol.value.lerp(SCOL[S.season],Math.min(dt*2,1));U.uFall.value=lerp(U.uFall.value,SFALL[S.season],Math.min(dt*2,1));U.uFocus.value=S.lvl==null?-1:S.lvl;
