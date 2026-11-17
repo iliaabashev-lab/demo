@@ -370,11 +370,11 @@
   /* ---------- сравнение один на один ---------- */
   function vsInner(s) {
     var rv = s.rivals[store.rival], wins = rv.v.filter(function (x) { return x[1] === '+'; }).length, total = rv.v.filter(function (x) { return x[1] !== '$'; }).length;
-    var tag = { '+': '<em class="t-win">AVTOHABR сильнее</em>', '=': '<em class="t-eq">наравне</em>', '?': '<em class="t-unk">нет данных</em>', '$': '' };
+    var tag = { '+': '<em class="t-win">AVTOHABR сильнее</em>', '=': '<em class="t-eq">наравне</em>', '?': '<em class="t-unk">нет данных</em>', 'x': '<em class="t-sep">отдельная программа</em>', '$': '' };
     return '<div class="vs-head"><span></span><b class="us">AVTOHABR</b><b>' + rv.name + '</b></div>' + s.rows.map(function (row, j) {
       var v = rv.v[j];
       return '<div class="vs-row' + (v[1] === '+' ? ' is-win' : '') + '"><span>' + row + '</span><span class="us">' + (v[1] === '$' ? '' : '<i class="ck"></i>') + s.us[j] + '</span><span class="them">' + v[0] + tag[v[1]] + '</span></div>';
-    }).join('') + '<div class="vs-foot"><p class="vs-score"><b class="mono">' + wins + '</b> из ' + total + ' пунктов: AVTOHABR сильнее, ' + (rv.v.some(function (x) { return x[1] === '?'; }) ? 'в остальных наравне или нет открытых данных' : 'в остальных наравне') + '</p><p class="srcs">' + rv.note + '</p></div>';
+    }).join('') + '<div class="vs-foot"><p class="vs-score">' + (rv.bundle ? '<b class="mono">1</b> окно вместо четырёх-пяти программ: запись, сайт, клиенты, учёт и склад связаны между собой</p>' : '<b class="mono">' + wins + '</b> из ' + total + ' пунктов: AVTOHABR сильнее, ' + (rv.v.some(function (x) { return x[1] === '?'; }) ? 'в остальных наравне или нет открытых данных' : 'в остальных наравне') + '</p>') + '<p class="srcs">' + rv.note + '</p></div>';
   }
   function segMove() {
     var b = $('.seg [aria-selected="true"]'), p = $('#segPill'); if (!b || !p) return;

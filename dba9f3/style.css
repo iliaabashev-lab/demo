@@ -648,3 +648,6 @@ p, li { font-size: var(--t2); line-height: 1.5; color: var(--text-2); }
 .pairs .pn { color: var(--text-2); }
 .pairs .pa { color: var(--text); background: rgba(74, 143, 232, .08); font-weight: 600; position: relative; padding-left: 44px; }
 .pairs .pa::before { content: ''; position: absolute; left: 18px; top: 24px; width: 12px; height: 7px; border-left: 2px solid var(--ok); border-bottom: 2px solid var(--ok); transform: rotate(-45deg); }
+
+.t-sep { color: #F3B562; border: 1px solid rgba(243, 181, 98, .45); background: rgba(243, 181, 98, .08); }
+.vs-row .them em.t-sep { margin-left: 12px; }
