@@ -1,0 +1,10 @@
+{
+  "name": "Plate — English lesson: meals and food",
+  "short_name": "Plate",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#120B07",
+  "theme_color": "#120B07",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
