@@ -1,5 +1,5 @@
 // Офлайн-кэш урока: страница из сети с запасом в кэше, файлы сборки из кэша.
-const CACHE = 'plate-v1';
+const CACHE = 'plate-v2';
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(['./', './index.html', './icon.svg', './manifest.webmanifest'])));
   self.skipWaiting();
