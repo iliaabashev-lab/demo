@@ -374,7 +374,7 @@
     return '<div class="vs-head"><span></span><b class="us">AVTOHABR</b><b>' + rv.name + '</b></div>' + s.rows.map(function (row, j) {
       var v = rv.v[j];
       return '<div class="vs-row' + (v[1] === '+' ? ' is-win' : '') + '"><span>' + row + '</span><span class="us">' + (v[1] === '$' ? '' : '<i class="ck"></i>') + s.us[j] + '</span><span class="them">' + v[0] + tag[v[1]] + '</span></div>';
-    }).join('') + '<div class="vs-foot"><p class="vs-score"><b class="mono">' + wins + '</b> из ' + total + ' пунктов: AVTOHABR сильнее, в остальных наравне или нет открытых данных</p><p class="srcs">' + rv.note + '</p></div>';
+    }).join('') + '<div class="vs-foot"><p class="vs-score"><b class="mono">' + wins + '</b> из ' + total + ' пунктов: AVTOHABR сильнее, ' + (rv.v.some(function (x) { return x[1] === '?'; }) ? 'в остальных наравне или нет открытых данных' : 'в остальных наравне') + '</p><p class="srcs">' + rv.note + '</p></div>';
   }
   function segMove() {
     var b = $('.seg [aria-selected="true"]'), p = $('#segPill'); if (!b || !p) return;

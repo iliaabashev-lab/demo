@@ -490,7 +490,7 @@ p, li { font-size: var(--t2); line-height: 1.5; color: var(--text-2); }
 .vs-head, .vs-row { display: grid; grid-template-columns: 300px 560px 1fr; }
 .vs-head > * { padding: 14px 22px; font-family: var(--f-mono); font-weight: 400; font-size: 17px; color: var(--muted); background: rgba(18, 28, 51, .9); }
 .vs-head .us { color: var(--acc-2); background: rgba(74, 143, 232, .2); }
-.vs-row > span { padding: 8px 22px; border-top: 1px solid var(--line); font-size: 19px; line-height: 1.35; display: flex; align-items: center; gap: 12px; }
+.vs-row > span { padding: 6px 22px; border-top: 1px solid var(--line); font-size: 18px; line-height: 1.35; display: flex; align-items: center; gap: 12px; }
 .vs-row > span:first-child { color: var(--text); font-weight: 600; }
 .vs-row .us { background: rgba(74, 143, 232, .12); color: var(--text); font-weight: 600; }
 .vs-row.is-win .us { background: rgba(74, 143, 232, .2); box-shadow: inset 3px 0 0 var(--acc); }
