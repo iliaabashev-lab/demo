@@ -119,11 +119,11 @@ kbd{font:500 11px/1 var(--fm);border:1px solid var(--line2);padding:3px 6px;bord
 .grid small{display:block;font:500 11px/1 var(--fm);color:var(--ink3);letter-spacing:.12em;margin-bottom:8px}
 .grid b{font:500 var(--s3)/1.05 var(--fd);letter-spacing:-.01em}
 .tip{position:fixed;z-index:7;left:0;top:0;pointer-events:none;font:500 11px/1 var(--fm);letter-spacing:.1em;text-transform:uppercase;padding:9px 11px;background:var(--ink);color:var(--bg);border-radius:2px;opacity:0;transition:opacity .2s;white-space:nowrap}
-.cur{position:fixed;left:0;top:0;z-index:10;pointer-events:none;width:20px;height:20px;margin:-10px 0 0 -10px;display:none}
-.cur:before{content:'';position:absolute;inset:0;border:1px solid rgba(239,229,211,.8);transform:rotate(45deg) scale(var(--s,1));transition:transform .3s var(--e),background .3s,border-color .3s}
-.cur:after{content:'';position:absolute;left:8px;top:8px;width:4px;height:4px;background:var(--red);transform:rotate(45deg)}
-body.hot .cur:before{--s:1.8;background:rgba(199,55,43,.22);border-color:var(--red)}
-@media (pointer:fine){html,body,button,summary,#gl{cursor:none}.cur{display:block}}
+.cz{position:fixed;left:0;top:0;z-index:10;pointer-events:none;width:20px;height:20px;margin:-10px 0 0 -10px;display:none}
+.cz:before{content:'';position:absolute;inset:0;border:1px solid rgba(239,229,211,.8);transform:rotate(45deg) scale(var(--s,1));transition:transform .3s var(--e),background .3s,border-color .3s}
+.cz:after{content:'';position:absolute;left:8px;top:8px;width:4px;height:4px;background:var(--red);transform:rotate(45deg)}
+body.hot .cz:before{--s:1.8;background:rgba(199,55,43,.22);border-color:var(--red)}
+@media (pointer:fine){html,body,button,summary,#gl{cursor:none}.cz{display:block}}
 .fxhint{position:fixed;top:72px;right:var(--gut);z-index:4;pointer-events:none;text-align:right;max-width:52ch;opacity:.8}.fxt{font:500 11px/1.4 var(--fm);color:var(--ochre);letter-spacing:.06em}
 @media (max-width:760px){.fxhint{top:56px;right:16px}}
 .dbg{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:5;font:500 11px/1 var(--fm);letter-spacing:.12em;text-transform:uppercase;color:var(--bg);background:var(--ochre);padding:8px 12px;border-radius:2px}
@@ -165,7 +165,7 @@ body.hot .cur:before{--s:1.8;background:rgba(199,55,43,.22);border-color:var(--r
  <button class="cta ghost" id="shL" data-act="go" hidden></button>
 </aside>
 <div class="menu" id="menu" role="dialog" aria-label="Оглавление"><button class="x" data-act="menu" aria-label="Закрыть оглавление">✕</button><div class="grid" id="grid"></div></div>
-<div class="tip" id="tip"></div><div class="cur" id="cur"></div><div class="fxhint" aria-hidden="true"><span class="fxt" id="fxt"></span></div><div class="dbg" id="dbg" hidden>Свободная камера · D</div>
+<div class="tip" id="tip"></div><div class="cz" id="cur"></div><div class="fxhint" aria-hidden="true"><span class="fxt" id="fxt"></span></div><div class="dbg" id="dbg" hidden>Свободная камера · D</div>
 <div class="load" id="load"><div><canvas id="lc" width="240" height="240"></canvas><p>Вышиваем мир</p></div></div>
 <script>/* three.js r147, MIT */
 /**
