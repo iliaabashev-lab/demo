@@ -335,7 +335,7 @@ addEventListener('wheel',e=>{if(S.menu||S.dbg.on||e.target.closest('.sheet,.menu
 let tx=0,ty=0,tt=0;
 addEventListener('touchstart',e=>{const t=e.touches[0];tx=t.clientX;ty=t.clientY;tt=Date.now()},{passive:true});
 addEventListener('touchend',e=>{if(S.menu||e.target.closest('.sheet,.menu,.hold,.opts'))return;const t=e.changedTouches[0],dx=t.clientX-tx,dy=t.clientY-ty;if(Date.now()-tt>700||Math.max(A(dx),A(dy))<55)return;const v=A(dx)>A(dy)?dx:dy;go(S.slide+(v<0?1:-1))},{passive:true});
-addEventListener('pointermove',e=>{S.px=e.clientX;S.py=e.clientY;S.mx=e.clientX/innerWidth*2-1;S.my=e.clientY/innerHeight*2-1;cur.style.transform=`translate(${e.clientX}px,${e.clientY}px)`;
+addEventListener('pointermove',e=>{S.px=e.clientX;S.py=e.clientY;S.mvT=performance.now();S.mx=e.clientX/innerWidth*2-1;S.my=e.clientY/innerHeight*2-1;cur.style.transform=`translate(${e.clientX}px,${e.clientY}px)`;
  const ui=e.target.closest&&e.target.closest('button,summary');document.body.classList.toggle('hot',!!ui||!!S.hov)});
 document.addEventListener('pointerleave',()=>{S.px=-1});
 
@@ -547,9 +547,10 @@ void main(){vec4 a=texture2D(uPA,ref),b=texture2D(uPB,ref),ca=texture2D(uCA,ref)
   else if(ty<6.5){if(abs(gc-29.)<.5){float e=sin(clamp(age/3.5,0.,1.)*3.14159),r0=exp(-Lx*Lx*.06),ly=floor(seed*4.);p.y+=r0*e*(1.2+ly*1.3);p.xz=c.xz+rot(p.xz-c.xz,r0*e*(ly-1.5)*.5);col=mix(col,vec3(1.,.8,.35)*2.4,clamp(exp(-Lx*Lx*.35)*e*1.5,0.,1.));col*=1.+r0*e*.6;}else{float w=exp(-pow(Lx-age*12.,2.)*.3)*fade;col*=1.+w*1.5;}}
   else if(ty<7.5){float band=-15.+age*13.,w=exp(-pow(p.y-band,2.)*.35)*fade,ax=exp(-dot(p.xz,p.xz)*.6);col*=1.+w*(1.5+ax*5.);p.xz*=1.+w*.06;}
   else{float f=exp(-L*L*.1)*fade;p.y+=f*age*2.6*(.5+seed);p.xz=c.xz+rot(p.xz-c.xz,f*age*2.2);col=mix(col,vec3(1.,.82,.4)*2.2,clamp(f*1.3,0.,1.));}}
- vec4 cp=projectionMatrix*viewMatrix*vec4(p,1.);vec2 sd=(cp.xy/max(cp.w,.001)-uMN)*vec2(uAsp,1.);float sl=length(sd),mf=pow(max(0.,1.-sl/.2),2.)*uMouseOn*step(0.,cp.w);
+ vec4 cp=projectionMatrix*viewMatrix*vec4(p,1.);vec2 sd=(cp.xy/max(cp.w,.001)-uMN)*vec2(uAsp,1.);float sl=length(sd),mf=exp(-sl*sl*55.)*uMouseOn*step(0.,cp.w);
  vec3 cr=vec3(viewMatrix[0][0],viewMatrix[1][0],viewMatrix[2][0]),cu=vec3(viewMatrix[0][1],viewMatrix[1][1],viewMatrix[2][1]);
- p+=(cr*sd.x+cu*sd.y)/max(sl,.001)*mf*cp.w*.09;col*=1.+mf*.8;
+ vec2 dn=sd/max(sl,.001),tn=vec2(-dn.y,dn.x),mv2=(dn*.55+tn*.45*sin(seed*6.2832+uTime*.8))*(.6+.8*seed);
+ p+=(cr*mv2.x+cu*mv2.y)*mf*cp.w*.016;col*=1.+mf*.35;
  vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;
  float dz=max(-mv.z,.1),sz=mix(a.w,b.w,m),ps=uSize*sz*uScale/dz,coc=abs(dz-uFocusD)*uDof;
  ps+=min(coc*5.,5.);float mxs=22.;
@@ -650,8 +651,8 @@ function tick(now){const dt=Math.min(clock.getDelta(),.05),tm=clock.elapsedTime;
  wheelA+=(Math.abs(wheelVel)<.5?angD(-S.season*Math.PI/2,wheelA)*Math.min(dt*2.2,1):0)+wheelVel*dt;wheelVel*=Math.pow(.3,dt);U.uWheel.value=wheelA;wheelG.rotation.y=wheelA;U.uSeason.value=S.season;
  U.uSCol.value.lerp(SCOL[S.season],Math.min(dt*2,1));U.uFall.value=lerp(U.uFall.value,SFALL[S.season],Math.min(dt*2,1));U.uFocus.value=S.lvl==null?-1:S.lvl;
  /* курсор раздвигает точки */
- let on=0;if(S.px>=0&&!S.dbg.on&&!S.menu&&!S.orb.drag){U.uMN.value.set(S.px/innerWidth*2-1,-(S.py/innerHeight)*2+1);U.uAsp.value=innerWidth/innerHeight;on=1}
- U.uMouseOn.value=lerp(U.uMouseOn.value,on,Math.min(dt*4,1));U.uMR.value=_p.distanceTo(_t)*.11;
+ let on=0;if(S.px>=0&&!S.dbg.on&&!S.menu&&!S.orb.drag&&performance.now()-(S.mvT||0)<450){U.uMN.value.set(S.px/innerWidth*2-1,-(S.py/innerHeight)*2+1);U.uAsp.value=innerWidth/innerHeight;on=1}
+ U.uMouseOn.value=lerp(U.uMouseOn.value,on,Math.min(dt*(on?5:2.2),1));U.uMR.value=_p.distanceTo(_t)*.11;
  const h=S.px>=0&&!S.anim?pickAt(S.px,S.py):null;if(h!==S.hov){S.hov=h;tip.style.opacity=h?1:0;tip.textContent=h?h.label:'';document.body.classList.toggle('hot',!!h)}
  if(h)tip.style.transform=`translate(${Math.min(S.px+18,innerWidth-tip.offsetWidth-8)}px,${S.py+16}px)`;
  R.render(scene,cam)}
