@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>AVTOHABR · онлайн-запись и CRM для сервиса</title>
+<meta name="description" content="AVTOHABR: онлайн-запись и CRM для сервиса. Презентация для встречи с «Lada Центр», Глазов.">
+<link rel="icon" href="assets/img/app-icon.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="scene" aria-hidden="true"></canvas>
+<div id="fallback" aria-hidden="true"></div>
+<div id="frame">
+  <div id="stage" role="region" aria-roledescription="презентация" aria-label="AVTOHABR: презентация">
+    <div class="bar"><i id="barFill"></i></div>
+    <header class="top">
+      <div class="brand"><img src="assets/img/app-icon.png" alt="" width="40" height="40"><b>AVTOHABR</b></div>
+      <div class="mono dim" id="chapter"></div>
+      <div class="mono count"><a class="toplink" href="https://app.avtohabr.ru/business" target="_blank" rel="noopener">app.avtohabr.ru ↗</a><i class="dot"></i><span id="count"></span></div>
+    </header>
+    <main id="slides" aria-live="polite"></main>
+    <footer class="nav">
+      <div class="tools">
+        <button class="tbtn" data-act="overview" aria-label="Обзор слайдов (O)">Обзор <kbd>O</kbd></button>
+        <button class="tbtn" data-act="notes" aria-label="Заметки докладчика (N)">Заметки <kbd>N</kbd></button>
+        <button class="tbtn" data-act="motion" id="motionBtn" aria-pressed="false">Без анимации <kbd>M</kbd></button>
+        <button class="tbtn" data-act="full" aria-label="Во весь экран (F)">Весь экран <kbd>F</kbd></button>
+      </div>
+      <div class="dots" id="dots" role="navigation" aria-label="Слайды"></div>
+      <div class="arrows">
+        <button class="abtn" data-act="prev" aria-label="Предыдущий слайд">←</button>
+        <button class="abtn primary magnet" data-act="next" aria-label="Следующий слайд">→</button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<div id="notes" class="overlay-panel" hidden>
+  <div class="mono dim">Заметки докладчика · <span id="notesNum"></span></div>
+  <p id="notesText"></p>
+  <button class="tbtn" data-act="notes">Скрыть <kbd>N</kbd></button>
+</div>
+
+<div id="overview" class="overlay" hidden>
+  <div class="ov-head"><span class="mono">Все слайды</span><button class="tbtn" data-act="overview">Закрыть <kbd>Esc</kbd></button></div>
+  <div class="ov-grid" id="ovGrid"></div>
+</div>
+
+<div id="lightbox" class="overlay" hidden>
+  <div class="lb-head"><span class="mono" id="lbCap"></span><span class="mono dim">Щелчок: увеличить · Esc: закрыть</span><button class="tbtn" data-act="lbclose">Закрыть</button></div>
+  <div class="lb-view" id="lbView"><img id="lbImg" alt=""></div>
+</div>
+
+<div id="toasts" aria-live="polite"></div>
+<div id="cursor" aria-hidden="true"><i class="c-dot"></i><div class="c-wrap"><i class="c-ring"></i><span class="c-label mono"></span></div></div>
+<div id="debug" class="mono" hidden></div>
+<noscript><p style="padding:40px;color:#E8EEFA;font:20px sans-serif">Для показа включите JavaScript. Версия без браузера: файлы в папке out (PPSX и PDF).</p></noscript>
+<script src="data.js"></script>
+<script src="scene.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
