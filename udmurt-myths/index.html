@@ -248,7 +248,7 @@ const QZ=[
 const QR={n:{s:0,t:'Вы видите тропы там, где другие видят чащу.'},v:{s:1,t:'Спокойны снаружи и глубоки внутри.'},k:{s:4,t:'Без вас в доме не держится тепло.'}};
 const chips=(arr,act)=>`<div class="chips" data-a>${arr.map((o,i)=>`<button class="chip" data-act="${act}" data-v="${i}" aria-pressed="false"><img src="${G(o.m)}" alt="">${o.n}</button>`).join('')}</div>`;
 const SL=[
- {t:'Начало',m:'star',k:'Удмуртия · мифология',h:'Мифы и легенды Удмуртии',b:`<p class="p" data-a>Как Шайтан прятал землю за щекой, почему небо ушло вверх и кто жил здесь до людей.</p><div class="row" data-a><button class="cta" data-act="go" data-v="1">Начать <span aria-hidden="true">→</span></button><span class="hint"><kbd>←</kbd><kbd>→</kbd> листать · <kbd>M</kbd> оглавление · <kbd>F</kbd> экран</span><span class="hint hint-t">Листайте свайпом</span></div>`},
+ {t:'Начало',m:'star',k:'Удмуртия · мифология',h:'Мифы и легенды Удмуртии',b:`<p class="p" data-a>Как Шайтан прятал землю за щекой, почему небо ушло вверх и кто жил здесь до людей.</p><div class="row" data-a><button class="cta" data-act="go" data-v="1">Начать <span aria-hidden="true">→</span></button><span class="hint"><kbd>←</kbd><kbd>→</kbd> листать · <kbd>M</kbd> оглавление · <kbd>F</kbd> экран · зажмите и тяните — вращать сцену</span><span class="hint hint-t">Листайте свайпом</span></div>`},
  {t:'Кто рассказывает',m:'rhomb',k:'Кто рассказывает',h:'Веками эти истории жили только в устной речи',b:`<p class="p" data-a>Удмурты — финно-угорский народ, ближайшая родня коми. Живут между Камой и Вяткой. Мифы стали записывать в XIX веке, одним из первых был этнограф Григорий Верещагин.</p><div class="stats" data-a><div class="stat"><b data-count="386465">0</b><span>удмуртов в России по переписи 2021 года</span></div><div class="stat"><b data-count="1920">1920</b><span>год образования автономии</span></div><div class="stat"><b>IX–XIII</b><span>века, когда стоял Иднакар</span></div></div>`},
  {t:'Три мира',m:'tree',k:'Устройство мира',h:'Мир устроен в три яруса',b:`<p class="p" data-a>Небо, землю и подземье связывает мировое дерево. Нажмите на ярус или выберите его ниже.</p>${chips(LV.map(l=>({n:l.k,m:l.m})),'level')}`},
  {t:'Сотворение земли',m:'wave',k:'Сотворение',h:'Землю достали со дна, но не всю',b:`<ol class="steps" id="steps" data-a><li>Вокруг была только вода. Инмар велел Шайтану нырнуть за землёй.</li><li>Шайтан достал горсть, а часть спрятал за щекой.</li><li>Земля росла и во рту. Шайтан выплюнул её, так появились горы и болота.</li></ol><div class="row" data-a><button class="cta" id="dive" data-act="dive">Нырнуть за землёй</button></div>`},
@@ -488,9 +488,9 @@ const SHI=[0,1,2,3,4,5,6,7,8,9,10,2];
 /* --- шейдер облака точек --- */
 const U={uPA:{value:SH[0].tp},uPB:{value:SH[0].tp},uCA:{value:SH[0].tc},uCB:{value:SH[0].tc},uMix:{value:1},uTime:{value:0},uSize:{value:.072},uScale:{value:800},uInt:{value:.9},
  uMouse:{value:new THREE.Vector3(0,-999,0)},uMR:{value:3},uMouseOn:{value:0},uGrow:{value:0},uMount:{value:0},uRip:{value:-9},uSky:{value:0},uFire:{value:0},uRing:{value:0},uSel:{value:-1},
- uWheel:{value:0},uSeason:{value:0},uSCol:{value:new THREE.Color(.72,.77,.54)},uFall:{value:.7},uFocus:{value:-1},uStyle:{value:0},uLeaf:{value:-1},uFlare:{value:-1},uAstro:{value:-1},uMoon:{value:0},uPuff:{value:-1},uFocusD:{value:30},uDof:{value:.045},uClick:{value:[0,1,2,3].map(()=>new THREE.Vector4(0,0,0,-9))},uClickK:{value:new THREE.Vector4()}};
+ uWheel:{value:0},uSeason:{value:0},uSCol:{value:new THREE.Color(.72,.77,.54)},uFall:{value:.7},uFocus:{value:-1},uStyle:{value:0},uMN:{value:new THREE.Vector2(9,9)},uAsp:{value:1},uLeaf:{value:-1},uFlare:{value:-1},uAstro:{value:-1},uMoon:{value:0},uPuff:{value:-1},uFocusD:{value:30},uDof:{value:.045},uClick:{value:[0,1,2,3].map(()=>new THREE.Vector4(0,0,0,-9))},uClickK:{value:new THREE.Vector4()}};
 const VS=`precision highp float;
-uniform sampler2D uPA,uPB,uCA,uCB;uniform float uMix,uTime,uSize,uScale,uMR,uMouseOn,uGrow,uMount,uRip,uSky,uFire,uRing,uSel,uWheel,uSeason,uFall,uFocus;uniform vec3 uMouse,uSCol;uniform float uStyle,uLeaf,uFocusD,uDof,uFlare,uAstro,uMoon,uPuff;uniform vec4 uClick[4];uniform vec4 uClickK;
+uniform sampler2D uPA,uPB,uCA,uCB;uniform float uMix,uTime,uSize,uScale,uMR,uMouseOn,uGrow,uMount,uRip,uSky,uFire,uRing,uSel,uWheel,uSeason,uFall,uFocus;uniform vec3 uMouse,uSCol;uniform vec2 uMN;uniform float uAsp;uniform float uStyle,uLeaf,uFocusD,uDof,uFlare,uAstro,uMoon,uPuff;uniform vec4 uClick[4];uniform vec4 uClickK;
 attribute vec2 ref;attribute float seed;varying vec3 vC;varying float vA;
 vec2 rot(vec2 v,float a){float c=cos(a),s=sin(a);return vec2(v.x*c+v.y*s,-v.x*s+v.y*c);}
 vec3 dyn(vec3 p,float g,float s,inout float br,inout vec3 col){
@@ -544,11 +544,12 @@ void main(){vec4 a=texture2D(uPA,ref),b=texture2D(uPB,ref),ca=texture2D(uCA,ref)
   else if(ty<3.5){if(abs(gc-1.)<.5){float fr=age*6.5,w=exp(-pow(Lx-fr,2.)*.15)*fade;p.y+=sin((Lx-fr)*2.)*w*1.2;col*=1.+w*3.;float sp=exp(-Lx*Lx*.5)*max(0.,sin(min(age*2.4,3.14159)));p.y+=sp*(2.5+seed*2.5);col*=1.+sp*2.5;}}
   else if(ty<4.5){float fr=age*6.,w=exp(-pow(Lx-fr,2.)*.35)*fade;p.y+=w*1.1;col=mix(col,vec3(1.,.93,.8)*2.,clamp(w*1.2,0.,1.));}
   else if(ty<5.5){if(abs(gc-3.)<.5){vec2 d2=p.xz-c.xz;float op=smoothstep(0.,.15,age)*(1.-smoothstep(2.6,3.5,age));p.xz+=d2/max(Lx,.01)*exp(-Lx*Lx*.012)*op*12.;p.y+=exp(-Lx*Lx*.03)*op*3.;}if(abs(gc-4.)<.5)col*=1.+fade*2.;}
-  else if(ty<6.5){float fr=age*12.,w=exp(-pow(Lx-fr,2.)*.3)*fade;col=mix(col,vec3(.95,.75,.3)*2.2,clamp(w*1.2,0.,1.));p.y+=w*.9;}
+  else if(ty<6.5){if(abs(gc-29.)<.5){float e=sin(clamp(age/3.5,0.,1.)*3.14159),r0=exp(-Lx*Lx*.06),ly=floor(seed*4.);p.y+=r0*e*(1.2+ly*1.3);p.xz=c.xz+rot(p.xz-c.xz,r0*e*(ly-1.5)*.5);col=mix(col,vec3(1.,.8,.35)*2.4,clamp(exp(-Lx*Lx*.35)*e*1.5,0.,1.));col*=1.+r0*e*.6;}else{float w=exp(-pow(Lx-age*12.,2.)*.3)*fade;col*=1.+w*1.5;}}
   else if(ty<7.5){float band=-15.+age*13.,w=exp(-pow(p.y-band,2.)*.35)*fade,ax=exp(-dot(p.xz,p.xz)*.6);col*=1.+w*(1.5+ax*5.);p.xz*=1.+w*.06;}
   else{float f=exp(-L*L*.1)*fade;p.y+=f*age*2.6*(.5+seed);p.xz=c.xz+rot(p.xz-c.xz,f*age*2.2);col=mix(col,vec3(1.,.82,.4)*2.2,clamp(f*1.3,0.,1.));}}
- vec3 dm=p-uMouse;float dl=length(dm);
- p+=dm/max(dl,.001)*pow(max(0.,1.-dl/uMR),2.)*1.4*uMouseOn;
+ vec4 cp=projectionMatrix*viewMatrix*vec4(p,1.);vec2 sd=(cp.xy/max(cp.w,.001)-uMN)*vec2(uAsp,1.);float sl=length(sd),mf=pow(max(0.,1.-sl/.2),2.)*uMouseOn*step(0.,cp.w);
+ vec3 cr=vec3(viewMatrix[0][0],viewMatrix[1][0],viewMatrix[2][0]),cu=vec3(viewMatrix[0][1],viewMatrix[1][1],viewMatrix[2][1]);
+ p+=(cr*sd.x+cu*sd.y)/max(sl,.001)*mf*cp.w*.09;col*=1.+mf*.8;
  vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;
  float dz=max(-mv.z,.1),sz=mix(a.w,b.w,m),ps=uSize*sz*uScale/dz,coc=abs(dz-uFocusD)*uDof;
  ps+=min(coc*5.,5.);float mxs=22.;
@@ -603,7 +604,7 @@ addEventListener('pointermove',e=>{const d=S.dbg;if(!d.drag)return;const dx=e.cl
 glc.addEventListener('wheel',e=>{if(S.dbg.on)S.dbg.r=clamp(S.dbg.r*(1+e.deltaY*.001),3,250)},{passive:true});
 
 S.orb={th:0,ph:0,vth:0,drag:false};S.shake=0;let dX=0,dY=0,isDown=false,ck=0,trN=0,vpH=null,ringA=0,wheelA=0,ringVel=0,wheelVel=0,hintS=-1;const PY=[null,0,null,0,4.2,0,1.5,null,null,0,2,null],UPV0=new THREE.Vector3(0,1,0);
-const HINT=['светлячки и листопад','день и ночь','раскрутить ярусы мира','круги на воде','разогнать облака','шаг великанши','дозор: волна по холмам','закружить духов','зажечь или погасить огонь','раскрутить колесо года','звёздная воронка','раскрутить ярусы мира'],CTY=[8,4,-1,3,5,0,6,4,2,1,1,-1],fxt=$('#fxt'),COARSE=matchMedia('(pointer:coarse)').matches;
+const HINT=['светлячки и листопад','день и ночь','раскрутить ярусы мира','круги на воде','разогнать облака','шаг великанши','раскопки: поднять слои земли','закружить духов','зажечь или погасить огонь','раскрутить колесо года','звёздная воронка','раскрутить ярусы мира'],CTY=[8,4,-1,3,5,0,6,4,2,1,1,-1],fxt=$('#fxt'),COARSE=matchMedia('(pointer:coarse)').matches;
 glc.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'||S.dbg.on||e.button!==0)return;isDown=true;dX=e.clientX;dY=e.clientY});
 addEventListener('pointermove',e=>{if(!isDown)return;if(!S.orb.drag&&Math.hypot(e.clientX-dX,e.clientY-dY)>6){S.orb.drag=true}if(S.orb.drag){S.orb.th-=e.movementX*.005;S.orb.vth=-e.movementX*.3;S.orb.ph=clamp(S.orb.ph+e.movementY*.003,-.35,.5)}});
 addEventListener('pointerup',()=>{isDown=false;S.orb.drag=false});
@@ -637,7 +638,7 @@ function tick(now){const dt=Math.min(clock.getDelta(),.05),tm=clock.elapsedTime;
  cam.up.set(Math.sin(ak)*.18*(S.slide%2?1:-1),1,0).normalize();
  U.uScale.value=(vpH||innerHeight*R.getPixelRatio())/(2*Math.tan(cam.fov*Math.PI/360));
  cam.position.copy(_p);cam.lookAt(_t);_tPrev.copy(_t);
- U.uFocusD.value=lerp(U.uFocusD.value,_p.distanceTo(_t),Math.min(dt*1.2,1));U.uDof.value=.045+ak*.05;if(hintS!==S.slide){hintS=S.slide;fxt.textContent=(COARSE?'тап':'клик')+' — '+HINT[clamp(S.slide,0,N-1)]+(COARSE?'':' · тянуть — осмотреться')}
+ U.uFocusD.value=lerp(U.uFocusD.value,_p.distanceTo(_t),Math.min(dt*1.2,1));U.uDof.value=.045+ak*.05;if(hintS!==S.slide){hintS=S.slide;fxt.textContent=(COARSE?'тап':'клик')+' — '+HINT[clamp(S.slide,0,N-1)]+(COARSE?'':' · зажмите и тяните — вращать')}
  /* состояния сцен */
  const c=S.cr;if(c.run){c.t+=dt;if(c.t>9.2){c.run=false;c.done=true;uiDive()}}
  const t=c.t,st=!c.run&&!c.done?-1:t<2.4?0:t<5.2?1:2;if(st!==c.stage){c.stage=st;steps.forEach((li,i)=>li.classList.toggle('cur',i===st))}
@@ -649,7 +650,7 @@ function tick(now){const dt=Math.min(clock.getDelta(),.05),tm=clock.elapsedTime;
  wheelA+=(Math.abs(wheelVel)<.5?angD(-S.season*Math.PI/2,wheelA)*Math.min(dt*2.2,1):0)+wheelVel*dt;wheelVel*=Math.pow(.3,dt);U.uWheel.value=wheelA;wheelG.rotation.y=wheelA;U.uSeason.value=S.season;
  U.uSCol.value.lerp(SCOL[S.season],Math.min(dt*2,1));U.uFall.value=lerp(U.uFall.value,SFALL[S.season],Math.min(dt*2,1));U.uFocus.value=S.lvl==null?-1:S.lvl;
  /* курсор раздвигает точки */
- let on=0;if(S.px>=0&&!S.dbg.on&&!S.menu){ndc.set(S.px/innerWidth*2-1,-(S.py/innerHeight)*2+1);ray.setFromCamera(ndc,cam);cam.getWorldDirection(tmp);plane.setFromNormalAndCoplanarPoint(tmp,_t);if(ray.ray.intersectPlane(plane,mw)){U.uMouse.value.copy(mw);on=1}}
+ let on=0;if(S.px>=0&&!S.dbg.on&&!S.menu&&!S.orb.drag){U.uMN.value.set(S.px/innerWidth*2-1,-(S.py/innerHeight)*2+1);U.uAsp.value=innerWidth/innerHeight;on=1}
  U.uMouseOn.value=lerp(U.uMouseOn.value,on,Math.min(dt*4,1));U.uMR.value=_p.distanceTo(_t)*.11;
  const h=S.px>=0&&!S.anim?pickAt(S.px,S.py):null;if(h!==S.hov){S.hov=h;tip.style.opacity=h?1:0;tip.textContent=h?h.label:'';document.body.classList.toggle('hot',!!h)}
  if(h)tip.style.transform=`translate(${Math.min(S.px+18,innerWidth-tip.offsetWidth-8)}px,${S.py+16}px)`;
@@ -660,7 +661,7 @@ const QPR=[Math.min(devicePixelRatio||1,1.5),Math.min(devicePixelRatio||1,1.25),
 function setQ(l){qLv=l;R.setPixelRatio(QPR[l]);if(haloObj)haloObj.visible=l<2;ptsObj.geometry.setDrawRange(0,l>=3?NP/2:NP);U.uSize.value=l>=3?.09:.072;resize()}
 /* качество снижается, только если кадры реально медленные; фон, вкладка в тени и лимит 30 Гц энергосбережения не считаются */
 function frame(now){requestAnimationFrame(frame);const d=now-fL;fL=now;if(d>4&&d<100&&qLv<4&&!vpH){qI.push(d);if(qI.length>=90){const avg=qI.reduce((a,b)=>a+b,0)/qI.length,cap=qI.filter(x=>x>31&&x<36).length/qI.length;if(avg>24&&cap<.8)setQ(qLv+1);qI=[]}}tick(now)}
-go(startIdx,true);requestAnimationFrame(frame);fxt.textContent=(COARSE?'тап':'клик')+' — '+HINT[startIdx]+(COARSE?'':' · тянуть — осмотреться');
+go(startIdx,true);requestAnimationFrame(frame);fxt.textContent=(COARSE?'тап':'клик')+' — '+HINT[startIdx]+(COARSE?'':' · зажмите и тяните — вращать');
 window.MIFY={S,go,tile,M};
 addEventListener('hashchange',()=>{const i=clamp((parseInt(location.hash.slice(1),10)||1)-1,0,N-1);if(i!==S.slide)go(i)});
 /* Съёмка кадров 1920x1080 для PowerPoint: используется только при сборке pptx */
