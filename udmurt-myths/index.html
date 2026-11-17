@@ -607,7 +607,7 @@ glc.addEventListener('wheel',e=>{if(S.dbg.on)S.dbg.r=clamp(S.dbg.r*(1+e.deltaY*.
 S.orb={th:0,ph:0,vth:0,drag:false};S.shake=0;let dX=0,dY=0,isDown=false,ck=0,trN=0,vpH=null,ringA=0,wheelA=0,ringVel=0,wheelVel=0,hintS=-1;const PY=[null,0,null,0,4.2,0,1.5,null,null,0,2,null],UPV0=new THREE.Vector3(0,1,0);
 const HINT=['светлячки и листопад','день и ночь','раскрутить ярусы мира','круги на воде','разогнать облака','шаг великанши','раскопки: поднять слои земли','закружить духов','зажечь или погасить огонь','раскрутить колесо года','звёздная воронка','раскрутить ярусы мира'],CTY=[8,4,-1,3,5,0,6,4,2,1,1,-1],fxt=$('#fxt'),COARSE=matchMedia('(pointer:coarse)').matches;
 glc.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'||S.dbg.on||e.button!==0)return;isDown=true;dX=e.clientX;dY=e.clientY});
-addEventListener('pointermove',e=>{if(!isDown)return;if(!S.orb.drag&&Math.hypot(e.clientX-dX,e.clientY-dY)>6){S.orb.drag=true}if(S.orb.drag){S.orb.th-=e.movementX*.005;S.orb.vth=-e.movementX*.3;S.orb.ph=clamp(S.orb.ph+e.movementY*.003,-.35,.5)}});
+addEventListener('pointermove',e=>{if(!isDown)return;if(!S.orb.drag&&Math.hypot(e.clientX-dX,e.clientY-dY)>6){S.orb.drag=true}if(S.orb.drag){S.orb.back=false;S.orb.th-=e.movementX*.007;S.orb.vth=-e.movementX*.25;S.orb.ph=clamp(S.orb.ph+e.movementY*.005,-2.6,2.6)}});
 addEventListener('pointerup',()=>{isDown=false;S.orb.drag=false});
 window.__fx=(x,y)=>{ndc.set(x/innerWidth*2-1,-(y/innerHeight)*2+1);ray.setFromCamera(ndc,cam);const i=S.slide,py=PY[i],pt=new THREE.Vector3();
  if(py!=null)plane.set(UPV0,-py);else{cam.getWorldDirection(tmp);plane.setFromNormalAndCoplanarPoint(tmp,_t)}
@@ -629,8 +629,9 @@ function tick(now){const dt=Math.min(clock.getDelta(),.05),tm=clock.elapsedTime;
  S.gv+=(S.view-S.gv)*Math.min(dt*1.4,1);if(S.slide===5&&S.gv>.001){_p2.set(...GVP[0]);_t2.set(...GVP[1]);const k=ease(clamp(S.gv,0,1));_p.lerp(_p2,k);_t.lerp(_t2,k)}
  const ak=S.anim&&!vpH?Math.sin(Math.PI*Math.min((now-S.anim.s)/S.anim.d,1)):0;
  if(S.anim){if(!S.anim.p0){S.anim.p0=p0.copy(cam.position);S.anim.t0=t0.copy(_tPrev)}const k=Math.min((now-S.anim.s)/S.anim.d,1),e=ease(k);_p.lerpVectors(S.anim.p0,_p,e);_p.y+=Math.sin(Math.PI*k)*5;_t.lerpVectors(S.anim.t0,_t,e);if(k>=1)S.anim=null}
- if(!S.orb.drag){S.orb.th+=S.orb.vth*dt;S.orb.vth*=Math.pow(.05,dt);S.orb.th*=Math.pow(.3,dt);S.orb.ph*=Math.pow(.3,dt)}
- if(!vpH){const ox=_p.x-_t.x,oz=_p.z-_t.z,yw=(S.dbg.on?0:Math.sin(tm*.07)*.07)+S.orb.th,co=Math.cos(yw),si=Math.sin(yw);_p.x=_t.x+ox*co+oz*si;_p.z=_t.z-ox*si+oz*co;_p.y+=S.orb.ph*_p.distanceTo(_t)*.5+Math.sin(tm*.11)*.25}
+ if(S.orb.sl!==S.slide){S.orb.sl=S.slide;S.orb.th=angD(S.orb.th,0);S.orb.back=true;S.orb.vth=0}
+ if(!S.orb.drag){S.orb.th+=S.orb.vth*dt;S.orb.vth*=Math.pow(.05,dt);if(S.orb.back){const k=Math.pow(.04,dt);S.orb.th*=k;S.orb.ph*=k;if(Math.abs(S.orb.th)+Math.abs(S.orb.ph)<.002)S.orb.back=false}}
+ if(!vpH){const ox=_p.x-_t.x,oy=_p.y-_t.y,oz=_p.z-_t.z,r=Math.hypot(ox,oy,oz),yw=Math.atan2(ox,oz)+(S.dbg.on?0:Math.sin(tm*.07)*.07)+S.orb.th,el=clamp(Math.asin(clamp(oy/r,-1,1))+S.orb.ph,-1.15,1.45);_p.set(_t.x+r*Math.cos(el)*Math.sin(yw),_t.y+r*Math.sin(el)+Math.sin(tm*.11)*.25,_t.z+r*Math.cos(el)*Math.cos(yw))}
  if(S.shake>0){S.shake=Math.max(0,S.shake-dt*1.8);const a=S.shake*S.shake*.5;_p.x+=(Math.random()-.5)*a;_p.y+=(Math.random()-.5)*a}
  S.smx+=(S.mx-S.smx)*Math.min(dt*2.5,1);S.smy+=(S.my-S.smy)*Math.min(dt*2.5,1);
  if(S.dbg.on){const d=S.dbg;_p.set(_t.x+d.r*Math.sin(d.ph)*Math.sin(d.th),_t.y+d.r*Math.cos(d.ph),_t.z+d.r*Math.sin(d.ph)*Math.cos(d.th))}
