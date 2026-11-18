@@ -131,9 +131,9 @@
       var c = store.calc.check, p = ((c - 1000) / 19000 * 100).toFixed(1) + '%';
       return head(s, 0) + '<div class="pricegrid"><div class="' + r(2) + '"><div class="big" data-count="' + s.price.replace(/\D/g, '') + '">' + s.price + '</div><div class="per">' + s.per + ' · ' + s.terms.join(' · ') + '</div><p class="incl-h">Входит в подписку</p><div class="incl">' +
         s.included.map(function (t, j) { return '<span style="--j:' + j + '">' + t + '</span>'; }).join('') + '</div><div class="plans">' + s.plans.map(function (x) { return '<div class="plan"><span class="mono">' + x[0] + '</span><b>' + x[1] + '</b></div>'; }).join('') +
-        '</div></div><div class="panel calc' + r(3) + '"><h4>Окупаемость: посчитаем вместе</h4><label for="check">Средний чек сервиса <output id="checkOut">' + rub(c) + ' ₽</output></label>' +
+        '</div></div><div class="panel calc' + r(3) + '"><h4>Окупаемость: посчитаем вместе</h4><label for="check">Средний чек сервиса <output id="checkOut">' + chk(c) + '</output></label>' +
         '<input class="range" id="check" type="range" min="1000" max="20000" step="500" value="' + c + '" style="--p:' + p + '" aria-describedby="calcRes">' +
-        '<div class="scale"><span>1 000 ₽</span><span>20 000 ₽</span></div><div class="result" id="calcRes">' + calcInner() + '</div>' +
+        '<div class="scale"><span>1 000 ₽</span><span>20 000+ ₽</span></div><div class="result" id="calcRes">' + calcInner() + '</div>' +
         '<p class="small" style="margin-top:22px">Пример расчёта, не обещание результата. Формула: 5 000 ₽ ÷ средний чек.</p></div></div>';
     },
     next: function (s) {
@@ -388,11 +388,20 @@
   }
 
   /* ---------- калькулятор ---------- */
+  // чек меньше подписки: сколько записей окупают месяц; чек больше: во сколько раз одна запись окупает подписку
+  function chk(c) { return rub(c) + (c >= 20000 ? '+' : '') + ' ₽'; }
   function calcInner() {
-    var c = store.calc.check, m = Math.ceil(5000 / c), y = Math.ceil(40000 / 12 / c);
-    return '<b>' + m + '</b><span>' + plural(m, ['запись', 'записи', 'записей']) + ' в месяц окупают 5 000 ₽</span>' +
-      '<b class="sm">' + y + '</b><span>' + plural(y, ['запись', 'записи', 'записей']) + ' при оплате за год (40 000 ₽, ≈' + rub(40000 / 12) + ' ₽ в месяц)</span>';
+    var c = store.calc.check, top = c >= 20000;
+    function raz(x) { if (x % 1) return 'раза'; var a = x % 10, b = x % 100; return a >= 2 && a <= 4 && (b < 12 || b > 14) ? 'раза' : 'раз'; }
+    function line(cost, cls, what, note) {
+      if (c < cost) { var n = Math.ceil(cost / c); return '<b' + cls + '>' + n + '</b><span>' + plural(n, ['запись', 'записи', 'записей']) + ' в месяц окупают ' + what + note + '</span>'; }
+      var x = Math.round(c / cost * 10) / 10, k = String(x).replace('.', ',');
+      return '<b' + cls + '>×' + k + (top ? '+' : '') + '</b><span>одна запись окупает ' + what + (x >= 1.05 ? ' в ' + k + ' ' + raz(x) + (top ? ' и больше' : '') : '') + note + '</span>';
+    }
+    return line(5000, '', 'подписку 5 000 ₽', '') + line(40000 / 12, ' class="sm"', 'подписку при оплате за год', ' (40 000 ₽, ≈' + rub(40000 / 12) + ' ₽ в месяц)');
   }
+
+
 
   /* ---------- уведомления ---------- */
   function toast(title, text) {
@@ -582,7 +591,7 @@
     if (id !== 'check') return;
     var v = +e.target.value; store.calc.check = v;
     e.target.style.setProperty('--p', ((v - 1000) / 19000 * 100).toFixed(1) + '%');
-    $('#checkOut').textContent = rub(v) + ' ₽'; $('#calcRes').innerHTML = calcInner(); save();
+    $('#checkOut').textContent = chk(v); $('#calcRes').innerHTML = calcInner(); save();
   });
   // 3D-наклон окна за курсором (на сенсорных экранах выключен)
   document.addEventListener('pointermove', function (e) {
